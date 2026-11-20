@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; connect-src 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Карта по дате рождения</title>
+<meta name="description" content="Офлайн-расчёт: нумерология, натальная карта, джйотиш, Ба-цзы, Дизайн человека. Данные никуда не отправляются.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Карта рождения">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f3efe6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0c18" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#f3efe6;--bg2:#e9e2d2;--card:rgba(255,255,255,.92);--ink:#1d1d1f;--mute:#5f6168;--line:#ddd6c6;--acc:#7a5a12;--calc:#1f6f5c;--calcbg:#e3f2ec;--intr:#7a4b9c;--intrbg:#f1e8f7;--inbg:#fbfaf7;--err:#b3261e;--star:40,46,90;--navbg:rgba(243,239,230,.94);--gold:#b8892a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0a0c18;--bg2:#141838;--card:rgba(24,26,40,.93);--ink:#ececf2;--mute:#a3a5b5;--line:#2f3247;--acc:#e6c06a;--calc:#7fd3b8;--calcbg:#16352f;--intr:#d1aef0;--intrbg:#33284a;--inbg:#1d2033;--err:#ff8a80;--star:255,255,255;--navbg:rgba(10,12,24,.92);--gold:#e6c06a}}
+:root[data-theme="dark"]{--bg:#0a0c18;--bg2:#141838;--card:rgba(24,26,40,.93);--ink:#ececf2;--mute:#a3a5b5;--line:#2f3247;--acc:#e6c06a;--calc:#7fd3b8;--calcbg:#16352f;--intr:#d1aef0;--intrbg:#33284a;--inbg:#1d2033;--err:#ff8a80;--star:255,255,255;--navbg:rgba(10,12,24,.92);--gold:#e6c06a}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:60px}
+body{margin:0;background:var(--bg);background-image:radial-gradient(120% 60% at 50% 0%,var(--bg2),var(--bg) 70%);background-attachment:fixed;color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);overflow-x:hidden}
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:12px 16px 24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 10px}
+h1{font-size:22px;margin:0;line-height:1.25;letter-spacing:.2px}
+h1 span{color:var(--gold)}
+h2{font-size:19px;margin:0 0 6px;color:var(--acc)}
+h3{font-size:16px;margin:16px 0 4px}
+#theme{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;width:40px;height:40px;font-size:18px;flex:none}
+.card{scroll-margin-top:62px;position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;overflow:hidden}
+label{display:block;font-size:14px;color:var(--mute);margin:10px 0 4px}
+input,select{width:100%;font-size:16px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--inbg);color:var(--ink);min-height:44px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:15px;margin-top:12px}
+.chk input{width:22px;min-height:22px;height:22px}
+button.go{width:100%;margin-top:14px;font-size:17px;font-weight:600;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#b8892a,#e6c06a 50%,#b8892a);color:#1a1405;box-shadow:0 6px 18px rgba(184,137,42,.35);transition:transform .15s}
+button.go:active{transform:scale(.98)}
+.hint,.note{font-size:13px;color:var(--mute)}
+.note{margin:6px 0}
+.bdg{display:inline-block;font-size:12px;font-weight:600;border-radius:8px;padding:1px 8px;margin:4px 0}
+.bdg.calc{color:var(--calc);background:var(--calcbg)}
+.bdg.intr{color:var(--intr);background:var(--intrbg)}
+p.calc{border-left:3px solid var(--calc);padding-left:10px;margin:6px 0}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:6px 0}
+.grid th,.grid td{border:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+.grid th{color:var(--mute);font-weight:600}
+.kv td{padding:3px 6px 3px 0;vertical-align:top}.kv td:first-child{color:var(--mute);white-space:nowrap}
+.r{color:var(--err);font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ul{padding-left:20px;margin:6px 0}.small{font-size:14px}
+.err{color:var(--err)}
+.sci{border-style:dashed}
+.lnk{background:none;border:0;color:var(--acc);text-decoration:underline;font-size:14px;padding:0}
+.legend{font-size:12px;color:var(--mute);margin:4px 0 8px}.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin:0 4px 3px 6px;vertical-align:middle}
+svg text{font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2","Noto Sans Symbols",-apple-system,sans-serif}
+/* вкладки */
+#tabs{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:8px 16px;margin:4px -16px 0;background:rgba(8,9,18,.86);border-bottom:1px solid rgba(255,255,255,.08);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;font-size:14px;color:#c9c6d6;background:transparent;padding:7px 13px;border-radius:18px;border:1px solid rgba(255,255,255,.14);transition:background-color .5s,color .5s,border-color .5s;font-family:inherit}
+.tab.on{background:var(--tacc);color:#14110a;border-color:var(--tacc)}
+.tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ffb547;margin-left:4px;vertical-align:middle}
+.panel{outline:none}
+.need{display:inline-block;margin:2px 0 6px;padding:4px 10px;border-radius:10px;font-size:13px;font-weight:600;color:#2a1a00;background:#ffc861}
+.acts{display:flex;gap:8px;margin:4px 0 16px}
+.act{flex:1;min-height:44px;font-size:15px;font-weight:600;border-radius:12px;border:1px solid var(--tacc);background:rgba(10,10,20,.55);color:var(--tacc);font-family:inherit}
+.act:active{transform:scale(.98)}
+.foot{margin:-4px 2px 10px;color:rgba(230,230,240,.7)}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;z-index:30;background:#111;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;transition:opacity .3s,transform .3s;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+/* фоны вкладок: слои меняются плавно через opacity */
+#bgs{position:fixed;inset:0;z-index:0;pointer-events:none}
+#bgs .bg{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
+:root[data-tab="sum"] .b-sum,:root[data-tab="num"] .b-num,:root[data-tab="west"] .b-west,:root[data-tab="ved"] .b-ved,:root[data-tab="cn"] .b-cn,:root[data-tab="hd"] .b-hd{opacity:1}
+.b-sum{background:radial-gradient(110% 70% at 50% 0%,#232848,#0b0d1a 70%)}
+.b-num{background:radial-gradient(90% 60% at 50% 10%,#3a2170,#150c2c 60%,#0b0618)}
+.b-west{background:radial-gradient(70% 45% at 80% 15%,rgba(90,70,180,.35),transparent 70%),radial-gradient(60% 40% at 10% 70%,rgba(40,90,170,.3),transparent 70%),#04060f}
+.b-ved{background:radial-gradient(90% 60% at 50% 0%,#7a3510,#3a1406 55%,#1e0903)}
+.b-cn{background:radial-gradient(90% 60% at 70% 0%,#8e1d14,#4c0a08 60%,#2a0504)}
+.b-hd{background:repeating-linear-gradient(0deg,rgba(90,220,210,.06) 0 1px,transparent 1px 28px),repeating-linear-gradient(90deg,rgba(90,220,210,.06) 0 1px,transparent 1px 28px),radial-gradient(90% 60% at 50% 0%,#0f3a3c,#071a1d 60%,#040d0f)}
+#sky{opacity:0;transition:opacity .9s ease}
+:root[data-tab="west"] #sky{opacity:1}
+:root{--tacc:#e6c06a}
+:root[data-tab="num"]{--tacc:#f1cf7a}:root[data-tab="west"]{--tacc:#9fc2ff}:root[data-tab="ved"]{--tacc:#ffb347}:root[data-tab="cn"]{--tacc:#f3d58a}:root[data-tab="hd"]{--tacc:#7fe3d4}
+:root[data-tab] header h1{color:#f3eee0;transition:color .6s}
+:root[data-tab] .sig{color:var(--tacc)}
+/* ---------- Сводка ---------- */
+.card.sum{--ink:#ecebf3;--mute:#a9a8bd;--line:rgba(230,192,106,.22);--acc:#e6c06a;color:var(--ink);background:rgba(20,22,40,.9);border-color:rgba(230,192,106,.3)}
+.srow{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.sic{flex:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#14110a}
+.s-num{background:linear-gradient(135deg,#c9a7ff,#f1cf7a)}.s-west{background:linear-gradient(135deg,#7fb0ff,#c3d6ff)}.s-ved{background:linear-gradient(135deg,#ff9933,#ffd27a)}.s-cn{background:linear-gradient(135deg,#e2553f,#f3d58a)}.s-hd{background:linear-gradient(135deg,#3fc1b0,#a6f0e0)}
+.stx{flex:1;min-width:0}.sh{font-weight:700}.sb{font-size:14px;margin:2px 0 6px}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:8px;vertical-align:middle;margin-left:4px}
+.st.full{background:rgba(143,240,207,.16);color:#8ff0cf}.st.part{background:#ffc861;color:#2a1a00}
+.open{background:none;border:0;padding:4px 0;color:var(--acc);font-size:14px;font-weight:600;font-family:inherit;min-height:32px}
+/* ---------- Шрифтовое оформление вкладок (системные шрифты) ---------- */
+.card.num h2,.card.num h3,.glow-num{font-family:Georgia,"Times New Roman",serif}.card.num h2{font-size:24px;letter-spacing:1px;font-style:italic}
+.card.west h2,.card.west h3{font-family:"Helvetica Neue",-apple-system,sans-serif;font-weight:300;text-transform:uppercase;letter-spacing:2.5px}.card.west h2{font-size:17px}
+.card.ved{font-family:Palatino,"Palatino Linotype","Book Antiqua",Georgia,serif}.card.ved h2{font-size:22px;letter-spacing:.5px}
+.card.cn h2,.card.cn h3{font-family:"Songti SC","STSong","Noto Serif CJK SC",Georgia,serif;font-weight:900}.card.cn h2{font-size:23px;letter-spacing:3px}
+.card.hd h2,.card.hd h3,.card.hd p.calc,.card.hd .grid{font-family:"SF Mono",Menlo,Consolas,monospace}.card.hd h2{font-size:17px;letter-spacing:.5px}.card.hd p.calc,.card.hd .grid{font-size:13px}
+/* ---------- Нумерология ---------- */
+.card.num{--ink:#efe7ff;--mute:#b9aee0;--line:rgba(241,207,122,.22);--acc:#f1cf7a;--calc:#8ff0cf;--calcbg:rgba(143,240,207,.12);--intr:#e2c4ff;--intrbg:rgba(226,196,255,.14);--err:#ff9a8a;color:var(--ink);background:radial-gradient(90% 50% at 50% 0%,#3b2470,#1a1135 60%,#120c26);border-color:rgba(241,207,122,.3)}
+.num-hero{position:relative;height:246px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:62px;margin:4px 0 6px}
+.num-hero .geo{position:absolute;top:0;left:0;right:0;margin:0 auto;width:210px;height:210px;fill:none;stroke:#f1cf7a;stroke-width:.7;opacity:.55}
+.geo .o2{opacity:.5}.geo .o3{stroke-width:1.2}.geo .tri{stroke:#c9a7ff;stroke-width:.8}
+.geo-r{transform-origin:100px 100px;transform-box:view-box}
+.glow-num{position:relative;font-size:84px;font-weight:700;line-height:1;color:#ffe7a8;text-shadow:0 0 10px rgba(255,214,120,.9),0 0 30px rgba(241,180,80,.55),0 0 60px rgba(160,110,255,.45)}
+.num-cap{position:absolute;bottom:0;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#d8c9ff;margin-top:6px}
+.pyth td{border:1px solid var(--line);width:33.3%;text-align:center;padding:8px 4px;height:76px}
+.pyth .pn{font-size:21px;font-weight:700;letter-spacing:1px;word-break:break-all;color:#ffe7a8;text-shadow:0 0 8px rgba(255,214,120,.7),0 0 20px rgba(160,110,255,.5)}
+.pyth .cl{font-size:11px;color:var(--mute)}
+/* ---------- Западная ---------- */
+.card.west{--ink:#e8ecff;--mute:#a7b0d6;--line:rgba(140,160,255,.22);--acc:#9fc2ff;--calc:#8ff0cf;--calcbg:rgba(143,240,207,.12);--intr:#d6c2ff;--intrbg:rgba(214,194,255,.14);--err:#ff9a8a;color:var(--ink);border-color:rgba(140,160,255,.3);
+ background:radial-gradient(1px 1px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 72% 8%,#fff,transparent),radial-gradient(1.5px 1.5px at 88% 40%,#cfe0ff,transparent),radial-gradient(1px 1px at 30% 62%,#fff,transparent),radial-gradient(1px 1px at 55% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 8% 80%,#fff,transparent),radial-gradient(1px 1px at 92% 88%,#fff,transparent),radial-gradient(120% 70% at 50% 0%,#18245a,#0a0f2a 55%,#060818)}
+.wheel-wrap{max-width:360px;margin:6px auto 0}
+.wheel{width:100%;height:auto;display:block;overflow:visible}
+.wheel .rim{fill:none;stroke:rgba(200,215,255,.55);stroke-width:1}
+.wheel .rim2{fill:none;stroke:rgba(200,215,255,.25)}
+.wheel .sec{opacity:.16}
+.wheel .sdiv{stroke:rgba(200,215,255,.45)}
+.wheel .sgl{font-size:15px;text-anchor:middle;dominant-baseline:central}
+.wheel .cusp{stroke:rgba(200,215,255,.3);stroke-width:.8}
+.wheel .cusp.ax{stroke:#f1cf7a;stroke-width:1.4}
+.wheel .hn{font-size:9px;fill:#8d97c4;text-anchor:middle;dominant-baseline:central;font-family:-apple-system,sans-serif}
+.wheel .axl{font-size:10px;fill:#f1cf7a;font-weight:700;text-anchor:middle;font-family:-apple-system,sans-serif}
+.wheel .deco line{stroke:rgba(200,215,255,.35);stroke-width:.8}
+.wheel .deco,.wheel .wheel-in{transform-origin:170px 170px;transform-box:view-box}
+.wheel .asp{fill:none;stroke-width:1;opacity:.8;stroke-dasharray:1}
+.wheel .tick{stroke:#fff;stroke-width:1.2}
+.wheel .plg{font-size:16px;fill:#fff;text-anchor:middle;dominant-baseline:central}
+.wheel .plg.lum{fill:#ffe39a}
+/* ---------- Ведическая ---------- */
+.card.ved{--ink:#fbe9d0;--mute:#e4bf95;--line:rgba(255,179,71,.28);--acc:#ffb347;--calc:#ffd27a;--calcbg:rgba(255,210,122,.14);--intr:#ffc2a6;--intrbg:rgba(255,194,166,.14);--err:#ffd27a;color:var(--ink);border-color:rgba(255,179,71,.45);background:radial-gradient(90% 55% at 50% 0%,#8a3c10,#4a1a07 55%,#2a0d04)}
+.orn{display:block;width:calc(100% + 28px);height:14px;margin:-14px -14px 8px;fill:#ffb347}
+.orn path{fill:none;stroke:#ffb347;stroke-width:1.2;stroke-dasharray:1}
+.m-wrap{position:relative;max-width:280px;margin:6px auto 4px;text-align:center}
+.mandala{display:block;width:100%;height:auto}
+.m-rot,.m-rot2,.lotus{transform-origin:130px 130px;transform-box:view-box}
+.mandala .nk{fill:rgba(255,179,71,.08);stroke:rgba(255,200,120,.45);stroke-width:.8}
+.mandala .nk.on{fill:#ffb347;stroke:#ffe1a8}
+.mandala .rs{fill:rgba(255,120,40,.08);stroke:rgba(255,200,120,.35);stroke-width:.8}
+.mandala .rs.on{fill:rgba(255,153,51,.55)}
+.mandala .petal{fill:rgba(255,153,51,.18);stroke:#ffcf7a;stroke-width:.8;transform-box:view-box}
+.mandala .bindu{fill:#ffcf7a}
+.m-cap{font-size:13px;letter-spacing:1px;color:#ffd9a0;margin-top:2px}
+/* ---------- Китай ---------- */
+.card.cn{--ink:#fbeedd;--mute:#f0c9a8;--line:rgba(243,213,138,.3);--acc:#f3d58a;--calc:#ffe2a0;--calcbg:rgba(255,226,160,.14);--intr:#ffd2c4;--intrbg:rgba(255,210,196,.14);--err:#ffe08a;color:var(--ink);border-color:rgba(243,213,138,.5);background:radial-gradient(90% 60% at 80% 0%,#a32a1c,#6e130f 55%,#4a0b0a)}
+.cn-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lantern{position:absolute;top:-4px;width:26px;height:46px}
+.cloud{position:absolute;top:44px;left:-40px;width:110px;opacity:.35}
+.cloud.c2{top:auto;bottom:24px;left:auto;right:-30px;width:90px;opacity:.25}
+.card.cn h2,.card.cn h3{position:relative}
+.card.cn .hz{white-space:nowrap;font-size:26px;line-height:1.15;color:#ffd77a;text-shadow:0 0 12px rgba(255,190,80,.45);font-family:"PingFang SC","Hiragino Sans GB","Songti SC","Noto Serif CJK SC",serif}
+.card.cn .grid td{text-align:center}
+.five{display:block;width:100%;max-width:300px;margin:6px auto 0}
+.five .gen{fill:none;stroke:rgba(243,213,138,.6);stroke-width:1.2;stroke-dasharray:1}
+.five .ctl{fill:none;stroke:rgba(255,226,160,.35);stroke-width:1;stroke-dasharray:1}
+.five .zero{opacity:.35}
+.five .hzn{font-size:17px;fill:#2a0b05;text-anchor:middle;dominant-baseline:central;font-weight:700;font-family:"PingFang SC","Hiragino Sans GB",serif}
+.five .cap{font-size:10px;fill:#fbeedd;text-anchor:middle;font-family:-apple-system,sans-serif}
+/* ---------- Дизайн человека ---------- */
+.card.hd{--ink:#e6f4f2;--mute:#9fc4c0;--line:rgba(120,220,210,.22);--acc:#7fe3d4;--calc:#a6f0c8;--calcbg:rgba(166,240,200,.12);--intr:#d6c2ff;--intrbg:rgba(214,194,255,.14);--err:#ffb08a;color:var(--ink);border-color:rgba(120,220,210,.3);background:radial-gradient(90% 60% at 50% 0%,#14403f,#0d2328 60%,#081619)}
+.body{display:block;width:100%;max-width:260px;margin:6px auto 0}
+.body .ch{fill:none;stroke:rgba(200,240,235,.16);stroke-width:4;stroke-linecap:round}
+.body .ch.on{stroke:#ffd77a;stroke-width:4;stroke-dasharray:1}
+.body .ctr{fill:rgba(255,255,255,.04);stroke:rgba(220,245,240,.7);stroke-width:1.5;stroke-linejoin:round}
+.body .ctr.on{stroke:#fff}
+.card.hd .scan{position:absolute;left:0;right:0;top:0;height:60px;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(127,227,212,.12),transparent);opacity:0}
+.body .flow{fill:none;stroke:#fff6d0;stroke-width:1.6;stroke-dasharray:.03 .09;opacity:0}
+.card.hd{background-image:repeating-linear-gradient(0deg,rgba(127,227,212,.05) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(127,227,212,.05) 0 1px,transparent 1px 22px),radial-gradient(90% 60% at 50% 0%,#14403f,#0d2328 60%,#081619)}
+/* ---------- Подпись ---------- */
+.sig{position:relative;z-index:1;text-align:center;padding:18px 16px 30px;font-size:16px;text-shadow:0 0 10px rgba(230,192,106,.35);letter-spacing:.6px;color:var(--gold)}
+.sig:before{content:"";display:block;width:120px;height:1px;margin:0 auto 10px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.sig b{font-weight:600}
+/* ---------- Старт-экран ---------- */
+#splash{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(100% 70% at 50% 40%,#1d2250,#0a0c18 70%);color:#f3e6c4;transition:opacity .6s ease,transform .6s ease}
+#splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
+#splash svg{width:220px;height:220px}
+#splash .sg{font-size:17px;fill:#e6c06a;text-anchor:middle;dominant-baseline:central}
+#splash .sp-ring{transform-origin:100px 100px;transform-box:view-box}
+#splash .sp-geo{fill:none;stroke:#e6c06a;stroke-width:.8;opacity:.7}
+#splash .t1{font-size:22px;font-weight:600;margin-top:18px;letter-spacing:.4px}
+#splash .t2{margin-top:22px;font-size:16px;font-weight:600;letter-spacing:1.2px;color:#f1d27f;text-shadow:0 0 12px rgba(241,210,127,.45)}
+#splash .t2:before{content:"";display:block;width:140px;height:1px;margin:0 auto 10px;background:linear-gradient(90deg,transparent,#e6c06a,transparent)}
+@media (max-width:380px){.row3{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}}
+@page{size:A4;margin:0}
+@media print{
+ *,*:before,*:after{animation:none!important;transition:none!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ html,body{width:210mm}
+ body{font-size:10.5pt;padding:0}
+ #form,#theme,#tabs,#bgs,.acts,.open,#sky,#splash,#toast,header,.foot,.lantern,.cloud,.scan,.body .flow{display:none!important}
+ .wrap{max-width:none;padding:0;margin:0}
+ .panel{display:none!important}
+ :root[data-print="all"] .panel,:root[data-print="num"] #p-num,:root[data-print="west"] #p-west,:root[data-print="ved"] #p-ved,:root[data-print="cn"] #p-cn,:root[data-print="hd"] #p-hd{display:block!important}
+ :root[data-print="all"] .panel+.panel{break-before:page}
+ .panel{padding:10mm 11mm 6mm;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+ .card{-webkit-box-decoration-break:clone;box-decoration-break:clone}
+ :root[data-print="all"],:root[data-print="all"] body{background:#0b0d1a!important}
+ :root[data-print="num"],:root[data-print="num"] body{background:#0b0618!important}
+ :root[data-print="west"],:root[data-print="west"] body{background:#04060f!important}
+ :root[data-print="ved"],:root[data-print="ved"] body{background:#1e0903!important}
+ :root[data-print="cn"],:root[data-print="cn"] body{background:#2a0504!important}
+ :root[data-print="hd"],:root[data-print="hd"] body{background:#071a1d!important}
+ #p-sum{background:radial-gradient(110% 40% at 50% 0%,#232848,#0b0d1a 70%)}
+ #p-num{background:radial-gradient(90% 40% at 50% 5%,#3a2170,#150c2c 60%,#0b0618)}
+ #p-west{background:#04060f}
+ #p-ved{background:radial-gradient(90% 40% at 50% 0%,#7a3510,#3a1406 55%,#1e0903)}
+ #p-cn{background:radial-gradient(90% 40% at 70% 0%,#8e1d14,#4c0a08 60%,#2a0504)}
+ #p-hd{background:#071a1d}
+ .card{margin:0 0 6mm;border-radius:10px;overflow:visible;break-inside:auto;scroll-margin:0}
+ .card h2,.card h3{break-after:avoid}
+ tr,.srow,.num-hero,.wheel-wrap,.m-wrap,.five,.body,.pyth,.two,p,li{break-inside:avoid}
+ .wheel-wrap{max-width:120mm}.body{max-width:90mm}.m-wrap{max-width:85mm}.five{max-width:85mm}
+ .card.cn .grid td{break-inside:avoid}
+ .sig{display:none!important}
+ .panel:after{content:"Разработано: Калачев М.В.";display:block;text-align:center;font-size:9pt;color:var(--tacc,#e6c06a);margin-top:4mm;letter-spacing:.5px}
+ #p-num{--tacc:#f1cf7a}#p-west{--tacc:#9fc2ff}#p-ved{--tacc:#ffb347}#p-cn{--tacc:#f3d58a}#p-hd{--tacc:#7fe3d4}#p-sum{--tacc:#e6c06a}
+ .card:not(.num):not(.west):not(.ved):not(.cn):not(.hd):not(.sum){--card:#1a1c2c;--ink:#ececf2;--mute:#a3a5b5;--line:#2f3247;--acc:#e6c06a;--calc:#7fd3b8;--calcbg:#16352f;--intr:#d1aef0;--intrbg:#33284a;background:#1a1c2c;color:#ececf2}
+}
+/* ---------- Анимации (только если пользователь не просил их отключить) ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinIn{from{opacity:0;transform:rotate(-120deg) scale(.82)}to{opacity:1;transform:none}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(7px) rotate(2deg)}}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(60px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
+@keyframes glowp{0%,100%{opacity:1}50%{opacity:.82}}
+@keyframes materialize{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes orbitIn{from{opacity:0;transform:translateX(-22px) rotate(-1.5deg)}to{opacity:1;transform:none}}
+@keyframes bloom{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes unroll{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.7) rotate(-10deg)}70%{opacity:1;transform:scale(.96) rotate(1deg)}100%{opacity:1;transform:none}}
+@keyframes boot{0%{opacity:0;transform:translateY(5px)}25%{opacity:.7}35%{opacity:.15}55%{opacity:.9}65%{opacity:.4}100%{opacity:1;transform:none}}
+@keyframes scan{from{transform:translateY(-60px);opacity:1}to{transform:translateY(1400px);opacity:1}}
+@keyframes flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-1}}
+@keyframes petal{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:none}}
+@keyframes panelIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes drawg{from{stroke-dashoffset:400}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion: no-preference){
+ html{scroll-behavior:smooth}
+ .panel.shown{animation:panelIn .45s cubic-bezier(.2,.7,.2,1) both}
+ /* Сводка: строки выезжают по очереди */
+ .sum.in .srow{animation:rise .55s ease both}
+ /* Нумерология: «материализация», геометрия, свечение, клетки */
+ .num.in>*{animation:materialize .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 70ms)}
+ .in .geo-r{animation:spin 90s linear infinite}
+ .in .geo circle,.in .geo polygon{stroke-dasharray:400;animation:drawg 2.2s ease both}
+ .in .glow-num{animation:pop .9s cubic-bezier(.2,1.4,.4,1) both,glowp 3.5s ease-in-out 1s infinite}
+ .in .pyth td{animation:pop .5s ease both}
+ .in .pyth tr:nth-child(1) td:nth-child(1){animation-delay:.15s}.in .pyth tr:nth-child(1) td:nth-child(2){animation-delay:.25s}.in .pyth tr:nth-child(1) td:nth-child(3){animation-delay:.35s}
+ .in .pyth tr:nth-child(2) td:nth-child(1){animation-delay:.3s}.in .pyth tr:nth-child(2) td:nth-child(2){animation-delay:.4s}.in .pyth tr:nth-child(2) td:nth-child(3){animation-delay:.5s}
+ .in .pyth tr:nth-child(3) td:nth-child(1){animation-delay:.45s}.in .pyth tr:nth-child(3) td:nth-child(2){animation-delay:.55s}.in .pyth tr:nth-child(3) td:nth-child(3){animation-delay:.65s}
+ /* Астрология: «орбитальный» вход, колесо, планеты, аспекты */
+ .west.in>*{animation:orbitIn .6s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 60ms)}
+ .wheel .deco{animation:spin 140s linear infinite}
+ .in .wheel-in{animation:spinIn 1.6s cubic-bezier(.2,.7,.2,1) both}
+ .in .wheel .pl{animation:pop .5s ease both}
+ .in .wheel .asp{animation:draw 1s ease both}
+ /* Джйотиш: орнамент, распускающийся лотос, вращение колец, пульс накшатры */
+ .ved.in>*{animation:bloom .9s ease-out both;animation-delay:calc(var(--i,0) * 90ms)}
+ .ved.in .orn path{animation:draw 1.6s ease both}
+ .ved.in .m-rot{animation:spin 160s linear infinite}
+ .ved.in .m-rot2{animation:spin 220s linear infinite reverse}
+ .ved.in .petal{animation:petal .7s cubic-bezier(.2,1.3,.4,1) both;animation-delay:calc(.3s + var(--d))}
+ .ved.in .nk.on,.ved.in .rs.on{animation:pulse 2.6s ease-in-out infinite}
+ /* Ба-цзы: свиток сверху вниз, иероглифы-печати, фонарики, облака, круг стихий */
+ .cn.in>*{animation:unroll .6s ease both;animation-delay:calc(var(--i,0) * 70ms)}
+ .lantern{animation:floaty 6s ease-in-out infinite}
+ .cloud{animation:drift 26s ease-in-out infinite alternate}.cloud.c2{animation-duration:32s;animation-direction:alternate-reverse}
+ .cn.in .hz{animation:stamp .7s cubic-bezier(.2,1.2,.4,1) both;animation-delay:.5s}
+ .cn.in .grid td:nth-child(2) .hz{animation-delay:.65s}.cn.in .grid td:nth-child(3) .hz{animation-delay:.8s}.cn.in .grid td:nth-child(4) .hz{animation-delay:.95s}
+ .in .five .gen{animation:draw 1.4s ease both}
+ .in .five .ctl{animation:draw .8s ease both}
+ .in .five .node{animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+ /* Human Design: «загрузка» с мерцанием, сканер, центры и потоки по каналам */
+ .hd.in>*{animation:boot .7s steps(10,end) both;animation-delay:calc(var(--i,0) * 80ms)}
+ .hd.in>.scan{animation:scan 5s linear infinite}
+ .in .body .ctr{animation:fadein .6s ease both}
+ .in .body .ctr.on{animation:fadein .8s ease both,pulse 4s ease-in-out infinite}
+ .in .body .ch.on{animation:draw 1s ease both}
+ .in .body .flow{opacity:.9;animation:flow 2.4s linear infinite}
+ /* старт-экран */
+ #splash .sp-ring{animation:spin 24s linear infinite}
+ #splash .sp-geo circle{stroke-dasharray:400;animation:drawg 1.8s ease both}
+ #splash .t1{animation:rise .8s ease .3s both}
+ #splash .t2{animation:rise .8s ease .7s both}
+}
+@media (prefers-reduced-motion: reduce){.body .flow{display:none}.card.hd .scan{display:none}}
+@media (prefers-reduced-motion: reduce){*,*:before,*:after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="bgs" aria-hidden="true"><div class="bg b-sum"></div><div class="bg b-num"></div><div class="bg b-west"></div><div class="bg b-ved"></div><div class="bg b-cn"></div><div class="bg b-hd"></div></div>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div id="splash" role="presentation">
+  <svg viewBox="0 0 200 200" aria-hidden="true"><g class="sp-ring"></g><g class="sp-geo"><circle cx="100" cy="100" r="22"/><circle cx="122" cy="100" r="22"/><circle cx="78" cy="100" r="22"/><circle cx="111" cy="119" r="22"/><circle cx="89" cy="119" r="22"/><circle cx="111" cy="81" r="22"/><circle cx="89" cy="81" r="22"/><circle cx="100" cy="100" r="62"/></g></svg>
+  <div class="t1">Карта по дате рождения</div>
+  <div class="t2">Разработано: Калачев М.В.</div>
+</div>
+<div class="wrap">
+<header><h1>Карта <span>по дате рождения</span></h1><button id="theme" type="button" aria-label="Тема">◐</button></header>
+<form id="form" class="card" autocomplete="off" onsubmit="return false">
+  <label for="date">Дата рождения *</label>
+  <input id="date" type="date" required min="1800-01-01" max="2100-12-31">
+  <div class="row">
+    <div><label for="time">Время (если известно)</label><input id="time" type="time"></div>
+    <div><label for="hs">Система домов</label><select id="hs"><option value="placidus">Плацидус</option><option value="equal">Равнодомная</option><option value="whole">Целые знаки</option></select></div>
+  </div>
+  <label for="city">Город рождения (выбор из списка или ввод координат)</label>
+  <input id="city" list="cities" placeholder="Начните вводить: Москва…">
+  <datalist id="cities"></datalist>
+  <div class="row3">
+    <div><label for="lat">Широта, °</label><input id="lat" inputmode="decimal" placeholder="55.756"></div>
+    <div><label for="lon">Долгота, ° (в. +)</label><input id="lon" inputmode="decimal" placeholder="37.617"></div>
+    <div><label for="tzman">UTC ±, ч</label><input id="tzman" inputmode="decimal" placeholder="авто"></div>
+  </div>
+  <input id="zone" type="hidden">
+  <p class="hint">Смещение подставляется автоматически по городу с учётом летнего и «декретного» времени на дату рождения. Ручное значение (например, 4 или 5.5) имеет приоритет.</p>
+  <label for="name">Имя (по желанию, для чисел имени)</label>
+  <input id="name" placeholder="Например: Иван или IVAN">
+  <label class="chk"><input id="remember" type="checkbox"> Запомнить на этом устройстве</label>
+  <p id="saved" class="hint" hidden>Данные сохранены только в этом браузере. <button id="forget" class="lnk" type="button">Удалить</button></p>
+  <button id="go" class="go" type="button">Рассчитать</button>
+  <p class="hint">Все расчёты выполняются на устройстве. Страница не обращается к сети.</p>
+</form>
+<div id="out"></div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<footer class="sig">Разработано: <b>Калачев М.В.</b></footer>
+<script>
+/* Ядро расчётов. Всё локально, без сети.
+   Планеты: упрощённая аналитическая теория (элементы орбит П. Шлютера, «How to compute planetary positions»,
+   с вековыми членами и главными возмущениями Луны, Юпитера, Сатурна, Урана; Плутон — подгоночный ряд).
+   Время: UT ~ TT (ΔT не учитывается, для Луны это ~0,5'). */
+var Core = (function () {
+  'use strict';
+  var R = Math.PI / 180, D = 180 / Math.PI;
+  function rev(x) { x = x % 360; return x < 0 ? x + 360 : x; }
+  function sn(x) { return Math.sin(x * R); }
+  function cs(x) { return Math.cos(x * R); }
+  function at2(y, x) { return Math.atan2(y, x) * D; }
+
+  // Юлианская дата по григорианскому календарю (Meeus, гл. 7), UT
+  function jd(y, m, d, h) {
+    if (m <= 2) { y -= 1; m += 12; }
+    var A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+    if (y < 1582 || (y === 1582 && (m < 10 || (m === 10 && d < 15)))) B = 0;
+    return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + (h || 0) / 24 + B - 1524.5;
+  }
+  function jdToDate(J) { // -> {y,m,d,h} UT
+    var Z = Math.floor(J + 0.5), F = J + 0.5 - Z, A = Z;
+    if (Z >= 2299161) { var al = Math.floor((Z - 1867216.25) / 36524.25); A = Z + 1 + al - Math.floor(al / 4); }
+    var B = A + 1524, C = Math.floor((B - 122.1) / 365.25), Dd = Math.floor(365.25 * C), E = Math.floor((B - Dd) / 30.6001);
+    var day = B - Dd - Math.floor(30.6001 * E) + F, m = E < 14 ? E - 1 : E - 13, y = m > 2 ? C - 4716 : C - 4715;
+    var d = Math.floor(day); return { y: y, m: m, d: d, h: (day - d) * 24 };
+  }
+  function obliq(J) { return 23.4393 - 3.563e-7 * (J - 2451543.5); }
+
+  function kepler(M, e) {
+    var E = M + e * D * sn(M) * (1 + e * cs(M));
+    for (var k = 0; k < 30; k++) {
+      var dE = (E - e * D * sn(E) - M) / (1 - e * cs(E));
+      E -= dE; if (Math.abs(dE) < 1e-7) break;
+    }
+    return E;
+  }
+  var EL = {
+    sun: function (d) { return { N: 0, i: 0, w: 282.9404 + 4.70935e-5 * d, a: 1, e: 0.016709 - 1.151e-9 * d, M: 356.0470 + 0.9856002585 * d }; },
+    moon: function (d) { return { N: 125.1228 - 0.0529538083 * d, i: 5.1454, w: 318.0634 + 0.1643573223 * d, a: 60.2666, e: 0.054900, M: 115.3654 + 13.0649929509 * d }; },
+    mercury: function (d) { return { N: 48.3313 + 3.24587e-5 * d, i: 7.0047 + 5.00e-8 * d, w: 29.1241 + 1.01444e-5 * d, a: 0.387098, e: 0.205635 + 5.59e-10 * d, M: 168.6562 + 4.0923344368 * d }; },
+    venus: function (d) { return { N: 76.6799 + 2.46590e-5 * d, i: 3.3946 + 2.75e-8 * d, w: 54.8910 + 1.38374e-5 * d, a: 0.723330, e: 0.006773 - 1.302e-9 * d, M: 48.0052 + 1.6021302244 * d }; },
+    mars: function (d) { return { N: 49.5574 + 2.11081e-5 * d, i: 1.8497 - 1.78e-8 * d, w: 286.5016 + 2.92961e-5 * d, a: 1.523688, e: 0.093405 + 2.516e-9 * d, M: 18.6021 + 0.5240207766 * d }; },
+    jupiter: function (d) { return { N: 100.4542 + 2.76854e-5 * d, i: 1.3030 - 1.557e-7 * d, w: 273.8777 + 1.64505e-5 * d, a: 5.20256, e: 0.048498 + 4.469e-9 * d, M: 19.8950 + 0.0830853001 * d }; },
+    saturn: function (d) { return { N: 113.6634 + 2.38980e-5 * d, i: 2.4886 - 1.081e-7 * d, w: 339.3939 + 2.97661e-5 * d, a: 9.55475, e: 0.055546 - 9.499e-9 * d, M: 316.9670 + 0.0334442282 * d }; },
+    uranus: function (d) { return { N: 74.0005 + 1.3978e-5 * d, i: 0.7733 + 1.9e-8 * d, w: 96.6612 + 3.0565e-5 * d, a: 19.18171 - 1.55e-8 * d, e: 0.047318 + 7.45e-9 * d, M: 142.5905 + 0.011725806 * d }; },
+    neptune: function (d) { return { N: 131.7806 + 3.0173e-5 * d, i: 1.7700 - 2.55e-7 * d, w: 272.8461 - 6.027e-6 * d, a: 30.05826 + 3.313e-8 * d, e: 0.008606 + 2.15e-9 * d, M: 260.2471 + 0.005995147 * d }; }
+  };
+  function orbit(o) {
+    var E = kepler(rev(o.M), o.e);
+    var xv = o.a * (cs(E) - o.e), yv = o.a * Math.sqrt(1 - o.e * o.e) * sn(E);
+    var v = at2(yv, xv), r = Math.sqrt(xv * xv + yv * yv), u = v + o.w;
+    var x = r * (cs(o.N) * cs(u) - sn(o.N) * sn(u) * cs(o.i));
+    var y = r * (sn(o.N) * cs(u) + cs(o.N) * sn(u) * cs(o.i));
+    var z = r * sn(u) * sn(o.i);
+    return { lon: rev(at2(y, x)), lat: at2(z, Math.sqrt(x * x + y * y)), r: r, v: v };
+  }
+  function sunRect(d) {
+    var s = EL.sun(d), o = orbit(s), lon = rev(o.v + s.w);
+    return { lon: lon, r: o.r, x: o.r * cs(lon), y: o.r * sn(lon), M: rev(s.M), w: s.w };
+  }
+  function helio(name, d) {
+    if (name === 'pluto') {
+      var S = 50.03 + 0.033459652 * d, P = 238.95 + 0.003968789 * d;
+      var lon = 238.9508 + 0.00400703 * d
+        - 19.799 * sn(P) + 19.848 * cs(P) + 0.897 * sn(2 * P) - 4.956 * cs(2 * P)
+        + 0.610 * sn(3 * P) + 1.211 * cs(3 * P) - 0.341 * sn(4 * P) - 0.190 * cs(4 * P)
+        + 0.128 * sn(5 * P) - 0.034 * cs(5 * P) - 0.038 * sn(6 * P) + 0.031 * cs(6 * P)
+        + 0.020 * sn(S - P) - 0.010 * cs(S - P);
+      var lat = -3.9082 - 5.453 * sn(P) - 14.975 * cs(P) + 3.527 * sn(2 * P) + 1.673 * cs(2 * P)
+        - 1.051 * sn(3 * P) + 0.328 * cs(3 * P) + 0.179 * sn(4 * P) - 0.292 * cs(4 * P)
+        + 0.019 * sn(5 * P) + 0.100 * cs(5 * P) - 0.031 * sn(6 * P) - 0.026 * cs(6 * P) + 0.011 * cs(S - P);
+      var r = 40.72 + 6.68 * sn(P) + 6.90 * cs(P) - 1.18 * sn(2 * P) - 0.03 * cs(2 * P) + 0.15 * sn(3 * P) - 0.14 * cs(3 * P);
+      // ряд Шлютера уже даёт долготу от равноденствия даты (проверено по PyEphem)
+      return { lon: rev(lon), lat: lat, r: r };
+    }
+    var h = orbit(EL[name](d));
+    var Mj = rev(EL.jupiter(d).M), Ms = rev(EL.saturn(d).M), Mu = rev(EL.uranus(d).M);
+    if (name === 'jupiter') {
+      h.lon += -0.332 * sn(2 * Mj - 5 * Ms - 67.6) - 0.056 * sn(2 * Mj - 2 * Ms + 21) + 0.042 * sn(3 * Mj - 5 * Ms + 21)
+        - 0.036 * sn(Mj - 2 * Ms) + 0.022 * cs(Mj - Ms) + 0.023 * sn(2 * Mj - 3 * Ms + 52) - 0.016 * sn(Mj - 5 * Ms - 69);
+    } else if (name === 'saturn') {
+      h.lon += 0.812 * sn(2 * Mj - 5 * Ms - 67.6) - 0.229 * cs(2 * Mj - 4 * Ms - 2) + 0.119 * sn(Mj - 2 * Ms - 3)
+        + 0.046 * sn(2 * Mj - 6 * Ms - 69) + 0.014 * sn(Mj - 3 * Ms + 32);
+      h.lat += -0.020 * cs(2 * Mj - 4 * Ms - 2) + 0.018 * sn(2 * Mj - 6 * Ms - 49);
+    } else if (name === 'uranus') {
+      h.lon += 0.040 * sn(Ms - 2 * Mu + 6) + 0.035 * sn(Ms - 3 * Mu + 33) - 0.015 * sn(Mj - Mu + 20);
+    }
+    return h;
+  }
+  function moon(d) {
+    var m = EL.moon(d), o = orbit(m), s = EL.sun(d);
+    var Ms = rev(s.M), Mm = rev(m.M), Ls = Ms + s.w, Lm = Mm + m.w + m.N, Dd = Lm - Ls, F = Lm - m.N;
+    var lon = o.lon
+      - 1.274 * sn(Mm - 2 * Dd) + 0.658 * sn(2 * Dd) - 0.186 * sn(Ms) - 0.059 * sn(2 * Mm - 2 * Dd)
+      - 0.057 * sn(Mm - 2 * Dd + Ms) + 0.053 * sn(Mm + 2 * Dd) + 0.046 * sn(2 * Dd - Ms) + 0.041 * sn(Mm - Ms)
+      - 0.035 * sn(Dd) - 0.031 * sn(Mm + Ms) - 0.015 * sn(2 * F - 2 * Dd) + 0.011 * sn(Mm - 4 * Dd);
+    var lat = o.lat - 0.173 * sn(F - 2 * Dd) - 0.055 * sn(Mm - F - 2 * Dd) - 0.046 * sn(Mm + F - 2 * Dd)
+      + 0.033 * sn(F + 2 * Dd) + 0.017 * sn(2 * Mm + F);
+    return { lon: rev(lon), lat: lat, node: rev(m.N) };
+  }
+  // Геоцентрическая эклиптическая долгота (равноденствие даты), градусы
+  function geoLon(name, J) {
+    var d = J - 2451543.5;
+    if (name === 'sun') return sunRect(d).lon;
+    if (name === 'moon') return moon(d).lon;
+    if (name === 'node') return moon(d).node; // средний восходящий узел (Раху)
+    var h = helio(name, d), s = sunRect(d);
+    var x = h.r * cs(h.lon) * cs(h.lat) + s.x, y = h.r * sn(h.lon) * cs(h.lat) + s.y;
+    return rev(at2(y, x));
+  }
+  var BODIES = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'node'];
+  function positions(J) {
+    var out = {};
+    BODIES.forEach(function (b) {
+      var l = geoLon(b, J), l1 = geoLon(b, J - 0.25), l2 = geoLon(b, J + 0.25);
+      var sp = rev(l2 - l1 + 180) - 180; // град / 0,5 сут
+      out[b] = { lon: l, speed: sp * 2, retro: sp < 0 };
+    });
+    return out;
+  }
+  // Звёздное время и угловые точки
+  function gmst(J) {
+    var T = (J - 2451545) / 36525;
+    return rev(280.46061837 + 360.98564736629 * (J - 2451545) + 0.000387933 * T * T - T * T * T / 38710000);
+  }
+  function eclFromRA(ra, eps) { return rev(at2(sn(ra), cs(ra) * cs(eps))); }
+  function angles(J, lat, lonE) {
+    var eps = obliq(J), ramc = rev(gmst(J) + lonE);
+    var mc = eclFromRA(ramc, eps);
+    var asc = rev(at2(cs(ramc), -(sn(eps) * Math.tan(lat * R) + cs(eps) * sn(ramc))));
+    return { ramc: ramc, mc: mc, asc: asc, eps: eps };
+  }
+  function placidus(J, lat, lonE) {
+    var a = angles(J, lat, lonE), eps = a.eps, ramc = a.ramc;
+    if (Math.abs(lat) >= 66) return null;
+    function cusp(k, above) {
+      var ra = ramc + (above ? 30 * k : 180 - 30 * (3 - k)), lam;
+      for (var it = 0; it < 50; it++) {
+        lam = eclFromRA(ra, eps);
+        var dec = Math.asin(sn(eps) * sn(lam)) * D;
+        var x = Math.tan(lat * R) * Math.tan(dec * R);
+        if (Math.abs(x) > 1) return null;
+        var ad = Math.asin(x) * D, nra;
+        if (above) nra = ramc + k / 3 * (90 + ad);
+        else nra = ramc + 180 - (3 - k) / 3 * (90 - ad);
+        if (Math.abs(rev(nra - ra + 180) - 180) < 1e-7) { ra = nra; break; }
+        ra = nra;
+      }
+      return eclFromRA(ra, eps);
+    }
+    var c11 = cusp(1, true), c12 = cusp(2, true), c2 = cusp(1, false), c3 = cusp(2, false);
+    if (c11 == null || c12 == null || c2 == null || c3 == null) return null;
+    var h = [a.asc, c2, c3, rev(a.mc + 180), rev(c11 + 180), rev(c12 + 180), rev(a.asc + 180), rev(c2 + 180), rev(c3 + 180), a.mc, c11, c12];
+    return { cusps: h, asc: a.asc, mc: a.mc };
+  }
+  function equalHouses(J, lat, lonE) {
+    var a = angles(J, lat, lonE), h = [];
+    for (var i = 0; i < 12; i++) h.push(rev(a.asc + 30 * i));
+    return { cusps: h, asc: a.asc, mc: a.mc };
+  }
+  function wholeSign(J, lat, lonE) {
+    var a = angles(J, lat, lonE), h = [], s = Math.floor(a.asc / 30) * 30;
+    for (var i = 0; i < 12; i++) h.push(rev(s + 30 * i));
+    return { cusps: h, asc: a.asc, mc: a.mc };
+  }
+  function houseOf(lon, cusps) {
+    for (var i = 0; i < 12; i++) {
+      var a = cusps[i], b = cusps[(i + 1) % 12];
+      if (rev(lon - a) < rev(b - a)) return i + 1;
+    }
+    return 12;
+  }
+  // Поиск момента, когда долгота Солнца = target (около J0), Ньютон
+  function sunAt(target, J0) {
+    var J = J0;
+    for (var i = 0; i < 40; i++) {
+      var diff = rev(target - geoLon('sun', J) + 180) - 180;
+      J += diff / 0.9856;
+      if (Math.abs(diff) < 1e-6) break;
+    }
+    return J;
+  }
+  // Новолуние около J0 (элонгация Луна-Солнце = 0)
+  function newMoonNear(J0) {
+    var J = J0;
+    for (var i = 0; i < 40; i++) {
+      var el = rev(geoLon('moon', J) - geoLon('sun', J) + 180) - 180;
+      J -= el / 12.19;
+      if (Math.abs(el) < 1e-5) break;
+    }
+    return J;
+  }
+  // Айанамша Лахири (средняя): 23°15'00" на 21.03.1956 + общая прецессия по Лиске
+  function ayanamsaLahiri(J) {
+    var T0 = (jd(1956, 3, 21, 0) - 2451545) / 36525, T = (J - 2451545) / 36525;
+    function p(t) { return (5029.0966 * t + 1.11113 * t * t) / 3600; }
+    return 23.25 + p(T) - p(T0);
+  }
+  return {
+    rev: rev, jd: jd, jdToDate: jdToDate, geoLon: geoLon, positions: positions, angles: angles,
+    placidus: placidus, equalHouses: equalHouses, wholeSign: wholeSign, houseOf: houseOf,
+    sunAt: sunAt, newMoonNear: newMoonNear, ayanamsaLahiri: ayanamsaLahiri, gmst: gmst, obliq: obliq, BODIES: BODIES
+  };
+})();
+
+</script>
+<script>
+/* Системы: нумерология, западная, ведическая, китайская (Ба-цзы), Дизайн человека, Матрица судьбы */
+var Sys = (function () {
+  'use strict';
+  var rev = Core.rev;
+  var SIGNS = ['Овен', 'Телец', 'Близнецы', 'Рак', 'Лев', 'Дева', 'Весы', 'Скорпион', 'Стрелец', 'Козерог', 'Водолей', 'Рыбы'];
+  var SIGN_EL = ['огонь', 'земля', 'воздух', 'вода'];
+  var SIGN_MODE = ['кардинальный', 'фиксированный', 'мутабельный'];
+  var SIGN_TXT = ['инициатива, прямота, импульсивность', 'устойчивость, практичность, упорство', 'любознательность, общительность, переменчивость',
+    'чувствительность, забота, привязанность к дому', 'самовыражение, щедрость, потребность в признании', 'аналитичность, аккуратность, критичность',
+    'дипломатичность, стремление к равновесию, нерешительность', 'глубина, сила воли, скрытность', 'широта взглядов, оптимизм, тяга к смыслу',
+    'дисциплина, ответственность, честолюбие', 'независимость, нестандартность, отстранённость', 'воображение, сопереживание, размытые границы'];
+  var BODY_RU = { sun: 'Солнце', moon: 'Луна', mercury: 'Меркурий', venus: 'Венера', mars: 'Марс', jupiter: 'Юпитер', saturn: 'Сатурн', uranus: 'Уран', neptune: 'Нептун', pluto: 'Плутон', node: 'Сев. узел' };
+  var BODY_TXT = { sun: 'ядро личности, воля, жизненная цель', moon: 'эмоции, привычки, потребность в безопасности', mercury: 'мышление, речь, обучение',
+    venus: 'ценности, симпатии, вкус, отношения', mars: 'действие, напор, способ добиваться', jupiter: 'рост, убеждения, удача',
+    saturn: 'структура, ограничения, ответственность', uranus: 'перемены, свобода (поколенческая планета)', neptune: 'идеалы, интуиция, иллюзии (поколенческая)',
+    pluto: 'трансформация, власть, кризисы (поколенческая)', node: 'направление развития (в трактовке)' };
+  var HOUSE_TXT = ['личность, манера держаться', 'деньги, ресурсы, ценности', 'общение, учёба, ближнее окружение', 'дом, семья, корни',
+    'творчество, дети, удовольствия', 'работа, быт, здоровье', 'партнёрство, брак, договоры', 'кризисы, общие ресурсы, глубинное',
+    'мировоззрение, высшее образование, дальние поездки', 'карьера, статус, цели', 'друзья, сообщества, планы', 'уединение, подсознание, скрытое'];
+
+  function fmtLon(l) {
+    l = rev(l); var s = Math.floor(l / 30), x = l - s * 30, d = Math.floor(x), m = Math.floor((x - d) * 60 + 1e-9);
+    return d + '°' + (m < 10 ? '0' : '') + m + '′ ' + SIGNS[s];
+  }
+  function signOf(l) { return Math.floor(rev(l) / 30); }
+
+  /* ---------- Нумерология ---------- */
+  function digits(s) { return String(s).replace(/\D/g, '').split('').map(Number); }
+  function dsum(n) { return digits(n).reduce(function (a, b) { return a + b; }, 0); }
+  function reduce(n, keepMaster) {
+    var steps = [n];
+    while (n > 9 && !(keepMaster && (n === 11 || n === 22 || n === 33))) { n = dsum(n); steps.push(n); }
+    return { n: n, steps: steps };
+  }
+  var NUM_TXT = { 1: 'лидерство, самостоятельность, инициатива', 2: 'сотрудничество, дипломатия, чуткость', 3: 'самовыражение, общительность, творчество',
+    4: 'порядок, труд, надёжность', 5: 'свобода, перемены, любознательность', 6: 'ответственность, забота, семья', 7: 'анализ, поиск истины, потребность в уединении',
+    8: 'организаторские способности, деньги, власть', 9: 'гуманизм, завершение, широта взгляда', 11: 'мастер-число: интуиция, вдохновение (в сумме — 2)',
+    22: 'мастер-число: «строитель», крупные практические замыслы (в сумме — 4)', 33: 'мастер-число: «учитель», служение (в сумме — 6)' };
+  function lifePath(y, m, d) {
+    var rd = reduce(d, true).n, rm = reduce(m, true).n, ry = reduce(dsum(y), true).n;
+    var tot = reduce(rd + rm + ry, true);
+    var all = reduce(dsum(String(d) + String(m) + String(y)), true);
+    return { rd: rd, rm: rm, ry: ry, sum: rd + rm + ry, res: tot, allDigits: dsum(String(d) + String(m) + String(y)), allRes: all };
+  }
+  function pythagoras(y, m, d) {
+    var ds = (d < 10 ? '0' : '') + d + (m < 10 ? '0' : '') + m + String(y);
+    var dg = digits(ds), n1 = dg.reduce(function (a, b) { return a + b; }, 0), n2 = dsum(n1);
+    var firstDay = d < 10 ? d : Math.floor(d / 10);
+    var n3raw = n1 - 2 * firstDay, n3 = Math.abs(n3raw), n4 = dsum(n3);
+    var all = dg.concat(digits(n1), digits(n2), digits(n3), digits(n4));
+    var cnt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    all.forEach(function (x) { cnt[x]++; });
+    return { dateStr: ds, n: [n1, n2, n3, n4], n3raw: n3raw, firstDay: firstDay, cnt: cnt, total: all.filter(function (x) { return x > 0; }).length };
+  }
+  var PYTH_CELL = { 1: 'характер, воля', 2: 'энергия, жизненный тонус', 3: 'познание, интерес к точным наукам, аккуратность', 4: 'здоровье, выносливость',
+    5: 'логика, интуиция', 6: 'труд, заземлённость, мастерство руками', 7: 'удача, талант', 8: 'чувство долга, ответственность', 9: 'память, ум' };
+  var PYTH_LINES = [
+    ['Строка 1-4-7 «цель, воля»', [1, 4, 7]], ['Строка 2-5-8 «семья»', [2, 5, 8]], ['Строка 3-6-9 «стабильность, привычки»', [3, 6, 9]],
+    ['Столбец 1-2-3 «самооценка»', [1, 2, 3]], ['Столбец 4-5-6 «быт, материальное»', [4, 5, 6]], ['Столбец 7-8-9 «талант, призвание»', [7, 8, 9]],
+    ['Диагональ 1-5-9 «духовность, целеустремлённость»', [1, 5, 9]], ['Диагональ 3-5-7 «темперамент»', [3, 5, 7]]];
+  // Таблицы букв: латиница (пифагорейская) и кириллица (33 буквы по кругу 1..9)
+  var RU = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя', RU_V = 'аеёиоуыэюя', LA = 'abcdefghijklmnopqrstuvwxyz', LA_V = 'aeiou';
+  function letterVal(ch) {
+    var i = RU.indexOf(ch); if (i >= 0) return (i % 9) + 1;
+    i = LA.indexOf(ch); if (i >= 0) return (i % 9) + 1;
+    return 0;
+  }
+  function nameNumbers(name) {
+    var s = (name || '').toLowerCase().replace(/[^a-zа-яё]/g, '');
+    if (!s) return null;
+    var all = 0, vow = 0, con = 0, parts = [];
+    s.split('').forEach(function (ch) {
+      var v = letterVal(ch); all += v; parts.push(ch.toUpperCase() + '=' + v);
+      if (RU_V.indexOf(ch) >= 0 || LA_V.indexOf(ch) >= 0) vow += v; else con += v;
+    });
+    return { letters: parts, expr: reduce(all, true), soul: reduce(vow, true), pers: reduce(con, true), sums: [all, vow, con] };
+  }
+  // Матрица судьбы (метод Н. Ладини): основные 5 точек
+  function r22(n) { while (n > 22) n = dsum(n); return n; }
+  var ARCANA = ['', 'Маг', 'Жрица', 'Императрица', 'Император', 'Иерофант', 'Влюблённые', 'Колесница', 'Справедливость', 'Отшельник', 'Колесо Фортуны', 'Сила',
+    'Повешенный', 'Смерть (перемены)', 'Умеренность', 'Дьявол', 'Башня', 'Звезда', 'Луна', 'Солнце', 'Суд', 'Мир', 'Шут'];
+  function destinyMatrix(y, m, d) {
+    var A = r22(d), B = r22(m), C = r22(dsum(y)), Dd = r22(A + B + C), E = r22(A + B + C + Dd);
+    return { A: A, B: B, C: C, D: Dd, E: E };
+  }
+
+  /* ---------- Западная астрология ---------- */
+  var ASPECTS = [[0, 'соединение', 8, 'слияние качеств'], [180, 'оппозиция', 8, 'напряжение, поиск баланса'], [120, 'трин', 7, 'гармония, лёгкость'],
+    [90, 'квадрат', 6, 'внутренний конфликт, стимул'], [60, 'секстиль', 4, 'возможность, сотрудничество']];
+  function aspects(pos) {
+    var keys = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'], out = [];
+    for (var i = 0; i < keys.length; i++) for (var j = i + 1; j < keys.length; j++) {
+      var a = pos[keys[i]].lon, b = pos[keys[j]].lon, sep = Math.abs(rev(a - b + 180) - 180);
+      ASPECTS.forEach(function (as) {
+        var orb = Math.abs(sep - as[0]);
+        if (orb <= as[2]) out.push({ a: keys[i], b: keys[j], name: as[1], orb: orb, txt: as[3] });
+      });
+    }
+    out.sort(function (x, y) { return x.orb - y.orb; });
+    return out;
+  }
+  function balance(pos, list) {
+    var el = [0, 0, 0, 0], mo = [0, 0, 0];
+    list.forEach(function (k) { var s = signOf(pos[k].lon); el[s % 4]++; mo[s % 3]++; });
+    return { el: el, mo: mo };
+  }
+  var PHASES = ['новолуние', 'растущий серп', 'первая четверть', 'растущая Луна', 'полнолуние', 'убывающая Луна', 'последняя четверть', 'убывающий серп'];
+  function moonPhase(sun, moon) { var e = rev(moon - sun); return { elong: e, name: PHASES[Math.floor(rev(e + 22.5) / 45) % 8] }; }
+
+  /* ---------- Ведическая (джйотиш) ---------- */
+  var RASHI = ['Меша', 'Вришабха', 'Митхуна', 'Карка', 'Симха', 'Канья', 'Тула', 'Вришчика', 'Дхану', 'Макара', 'Кумбха', 'Мина'];
+  var NAK = ['Ашвини', 'Бхарани', 'Криттика', 'Рохини', 'Мригашира', 'Ардра', 'Пунарвасу', 'Пушья', 'Ашлеша', 'Магха', 'Пурва-Пхалгуни', 'Уттара-Пхалгуни',
+    'Хаста', 'Читра', 'Свати', 'Вишакха', 'Анурадха', 'Джйештха', 'Мула', 'Пурва-Ашадха', 'Уттара-Ашадха', 'Шравана', 'Дхаништха', 'Шатабхиша',
+    'Пурва-Бхадрапада', 'Уттара-Бхадрапада', 'Ревати'];
+  var DASHA = [['Кету', 7], ['Венера', 20], ['Солнце', 6], ['Луна', 10], ['Марс', 7], ['Раху', 18], ['Юпитер', 16], ['Сатурн', 19], ['Меркурий', 17]];
+  function vedic(J, pos, asc) {
+    var ay = Core.ayanamsaLahiri(J), sid = {};
+    Object.keys(pos).forEach(function (k) { sid[k] = rev(pos[k].lon - ay); });
+    var ml = sid.moon, ni = Math.floor(ml / (360 / 27)), frac = ml / (360 / 27) - ni, pada = Math.floor(frac * 4) + 1;
+    var lord = ni % 9, bal = (1 - frac) * DASHA[lord][1];
+    var periods = [], t = J - frac * DASHA[lord][1] * 365.25;
+    for (var k = 0; k < 9; k++) {
+      var L = (lord + k) % 9, end = t + DASHA[L][1] * 365.25;
+      periods.push({ lord: DASHA[L][0], from: t, to: end, years: DASHA[L][1] }); t = end;
+    }
+    return { ay: ay, sid: sid, lagna: asc == null ? null : rev(asc - ay), nak: NAK[ni], nakIdx: ni, pada: pada, lord: DASHA[lord][0], balance: bal, periods: periods };
+  }
+
+  /* ---------- Китайская: зодиак и Ба-цзы ---------- */
+  var STEMS = ['Цзя', 'И', 'Бин', 'Дин', 'У', 'Цзи', 'Гэн', 'Синь', 'Жэнь', 'Гуй'];
+  var STEM_HZ = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'], BR_HZ = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+  var BRANCHES = ['Цзы', 'Чоу', 'Инь', 'Мао', 'Чэнь', 'Сы', 'У', 'Вэй', 'Шэнь', 'Ю', 'Сюй', 'Хай'];
+  var ANIMALS = ['Крыса', 'Бык', 'Тигр', 'Кролик', 'Дракон', 'Змея', 'Лошадь', 'Коза', 'Обезьяна', 'Петух', 'Собака', 'Свинья'];
+  var ANIMAL_TXT = ['находчивость, бережливость', 'упорство, надёжность', 'смелость, азарт', 'мягкость, осторожность', 'энергия, амбиции', 'мудрость, расчётливость',
+    'активность, свободолюбие', 'мягкость, артистичность', 'ловкость, изобретательность', 'прямота, педантичность', 'верность, справедливость', 'щедрость, искренность'];
+  var ELEM = ['Дерево', 'Огонь', 'Земля', 'Металл', 'Вода'];
+  var ELEM_TXT = ['рост, развитие, гибкость планов', 'активность, яркость, эмоциональность', 'стабильность, практичность', 'решительность, принципиальность', 'гибкость, ум, приспособляемость'];
+  var BR_ELEM = [4, 2, 0, 0, 2, 1, 1, 2, 3, 3, 2, 4];
+  var DM_TXT = ['ян-дерево («большое дерево»): прямота, стремление расти', 'инь-дерево («лиана, трава»): гибкость, приспособляемость',
+    'ян-огонь («солнце»): открытость, щедрость', 'инь-огонь («свеча»): внимательность, тепло', 'ян-земля («гора»): надёжность, упорство',
+    'инь-земля («пашня»): заботливость, практичность', 'ян-металл («руда, топор»): решительность, прямота', 'инь-металл («украшение»): утончённость, требовательность',
+    'ян-вода («река»): размах, предприимчивость', 'инь-вода («роса, дождь»): интуиция, тонкость'];
+  function stemEl(s) { return Math.floor(s / 2); }
+  // Китайский Новый год: месяц 11 содержит зимнее солнцестояние; Новый год — 2-е новолуние после начала месяца 11
+  // (даты по времени UTC+8; редкие годы с високосным 11/12 месяцем не учитываются)
+  function cnDay(J) { return Math.floor(J + 8 / 24 + 0.5); }
+  function cny(year) {
+    var ws = Core.sunAt(270, Core.jd(year - 1, 12, 21, 0));
+    var nm = Core.newMoonNear(ws);
+    if (cnDay(nm) > cnDay(ws)) nm = Core.newMoonNear(nm - 29.53);
+    var J = Core.newMoonNear(Core.newMoonNear(nm + 29.53) + 29.53);
+    var dt = Core.jdToDate(J + 8 / 24);
+    if (year === 2034) dt = { y: 2034, m: 2, d: 19 }; // високосный 11-й месяц 2033 г.: правило даёт сбой, дата по календарю КНР
+    return { y: dt.y, m: dt.m, d: dt.d, jdStart: Core.jd(dt.y, dt.m, dt.d, 0) - 8 / 24 };
+  }
+  function chinese(J, civil, lonE, hasTime) {
+    var y = civil.y;
+    var c = cny(y), zy = J < c.jdStart ? y - 1 : y;
+    var lichun = Core.sunAt(315, Core.jd(y, 2, 4, 0)), by = J < lichun ? y - 1 : y;
+    var ys = ((by - 4) % 10 + 10) % 10, yb = ((by - 4) % 12 + 12) % 12;
+    // месяц: от Солнца; месяц Инь начинается при λ=315°
+    var sl = Core.geoLon('sun', J), mi = Math.floor(rev(sl - 315) / 30);
+    var ms = ((ys % 5) * 2 + 2 + mi) % 10, mb = (2 + mi) % 12;
+    // день: по местному среднему солнечному времени (если есть долгота), иначе по гражданской дате
+    var solarJ = J + (lonE != null ? lonE / 360 : 0);
+    var sd = lonE != null && hasTime ? Core.jdToDate(solarJ) : civil;
+    var jdn = Math.floor(Core.jd(sd.y, sd.m, sd.d, 12) + 0.5) - (0); // JDN
+    var di = ((jdn + 49) % 60 + 60) % 60, dsI = di % 10, dbI = di % 12;
+    var hour = null;
+    if (hasTime) {
+      var sh = sd.h != null ? sd.h : civil.h, hb = Math.floor((sh + 1) / 2) % 12, hs = ((dsI % 5) * 2 + hb) % 10;
+      hour = { s: hs, b: hb, solarH: sh };
+    }
+    var pillars = [{ t: 'Год', s: ys, b: yb }, { t: 'Месяц', s: ms, b: mb }, { t: 'День', s: dsI, b: dbI }];
+    if (hour) pillars.push({ t: 'Час', s: hour.s, b: hour.b });
+    var el = [0, 0, 0, 0, 0];
+    pillars.forEach(function (p) { el[stemEl(p.s)]++; el[BR_ELEM[p.b]]++; });
+    return {
+      zodiacYear: zy, cny: c, animal: ((zy - 4) % 12 + 12) % 12, yearStem: ((zy - 4) % 10 + 10) % 10,
+      lichun: lichun, baziYear: by, pillars: pillars, el: el, dayMaster: dsI, sunLon: sl, hour: hour, solarDate: sd
+    };
+  }
+
+  /* ---------- Дизайн человека (по открытым описаниям системы; сверять с официальным расчётом) ---------- */
+  var HD_SEQ = [41, 19, 13, 49, 30, 55, 37, 63, 22, 36, 25, 17, 21, 51, 42, 3, 27, 24, 2, 23, 8, 20, 16, 35, 45, 12, 15, 52, 39, 53, 62, 56, 31, 33, 7, 4, 29, 59, 40, 64, 47, 6, 46, 18, 48, 57, 32, 50, 28, 44, 1, 43, 14, 34, 9, 5, 26, 11, 10, 58, 38, 54, 61, 60];
+  var HD_CENTERS = {
+    'Голова': [64, 61, 63], 'Аджна': [47, 24, 4, 17, 43, 11], 'Горло': [62, 23, 56, 35, 12, 45, 33, 8, 31, 20, 16], 'G (Я)': [1, 13, 25, 46, 2, 15, 10, 7],
+    'Сердце (Эго)': [21, 40, 26, 51], 'Сакрал': [5, 14, 29, 59, 9, 3, 42, 27, 34], 'Солнечное сплетение': [6, 37, 22, 36, 30, 55, 49],
+    'Селезёнка': [48, 57, 44, 50, 32, 28, 18], 'Корень': [53, 60, 52, 19, 39, 41, 58, 38, 54]
+  };
+  var HD_CH = [[1, 8], [2, 14], [3, 60], [4, 63], [5, 15], [6, 59], [7, 31], [9, 52], [10, 20], [10, 34], [10, 57], [11, 56], [12, 22], [13, 33], [16, 48], [17, 62], [18, 58], [19, 49],
+    [20, 34], [20, 57], [21, 45], [23, 43], [24, 61], [25, 51], [26, 44], [27, 50], [28, 38], [29, 46], [30, 41], [32, 54], [34, 57], [35, 36], [37, 40], [39, 55], [42, 53], [47, 64]];
+  var HD_TYPE_TXT = { 'Генератор': 'стратегия «откликаться» на то, что приходит извне', 'Манифестирующий генератор': 'стратегия «откликаться, затем информировать»',
+    'Проектор': 'стратегия «ждать приглашения» и признания', 'Манифестор': 'стратегия «информировать» перед действием', 'Рефлектор': 'стратегия «выждать лунный цикл (~28 дней)» перед важными решениями' };
+  var HD_LINE = ['', 'Исследователь', 'Отшельник', 'Мученик (экспериментатор)', 'Оппортунист', 'Еретик', 'Ролевая модель'];
+  function gateOf(l) { var x = rev(l - 302), i = Math.floor(x / 5.625); return { gate: HD_SEQ[i], line: Math.floor((x - i * 5.625) / 0.9375) + 1 }; }
+  function hdSide(J) {
+    var p = Core.positions(J), list = [['Солнце', p.sun.lon], ['Земля', p.sun.lon + 180], ['Луна', p.moon.lon], ['Сев. узел', p.node.lon], ['Юж. узел', p.node.lon + 180],
+      ['Меркурий', p.mercury.lon], ['Венера', p.venus.lon], ['Марс', p.mars.lon], ['Юпитер', p.jupiter.lon], ['Сатурн', p.saturn.lon], ['Уран', p.uranus.lon], ['Нептун', p.neptune.lon], ['Плутон', p.pluto.lon]];
+    return list.map(function (x) { var g = gateOf(x[1]); return { body: x[0], gate: g.gate, line: g.line }; });
+  }
+  function humanDesign(J) {
+    var sunB = Core.geoLon('sun', J), Jd = Core.sunAt(rev(sunB - 88), J - 89);
+    var P = hdSide(J), Dz = hdSide(Jd), act = {};
+    P.concat(Dz).forEach(function (x) { act[x.gate] = 1; });
+    var g2c = {}; Object.keys(HD_CENTERS).forEach(function (c) { HD_CENTERS[c].forEach(function (g) { g2c[g] = c; }); });
+    var chans = HD_CH.filter(function (c) { return act[c[0]] && act[c[1]]; });
+    var def = {}, adj = {};
+    chans.forEach(function (c) {
+      var a = g2c[c[0]], b = g2c[c[1]]; def[a] = def[b] = 1;
+      (adj[a] = adj[a] || []).push(b); (adj[b] = adj[b] || []).push(a);
+    });
+    function reach(from) { var seen = {}, st = [from]; seen[from] = 1; while (st.length) { var x = st.pop(); (adj[x] || []).forEach(function (y) { if (!seen[y]) { seen[y] = 1; st.push(y); } }); } return seen; }
+    var motors = ['Сакрал', 'Корень', 'Солнечное сплетение', 'Сердце (Эго)'];
+    var thr = def['Горло'] ? reach('Горло') : {}, motorThroat = motors.some(function (m) { return thr[m]; });
+    var type;
+    if (!Object.keys(def).length) type = 'Рефлектор';
+    else if (def['Сакрал']) type = motorThroat ? 'Манифестирующий генератор' : 'Генератор';
+    else type = motorThroat ? 'Манифестор' : 'Проектор';
+    var auth;
+    if (type === 'Рефлектор') auth = 'Лунный';
+    else if (def['Солнечное сплетение']) auth = 'Эмоциональный (Солнечное сплетение)';
+    else if (def['Сакрал']) auth = 'Сакральный';
+    else if (def['Селезёнка']) auth = 'Селезёночный';
+    else if (def['Сердце (Эго)']) auth = 'Эго (Сердце)';
+    else if (def['G (Я)']) auth = 'Самопроецируемый (G)';
+    else auth = 'Ментальный / окружение (нет внутреннего авторитета)';
+    // число раздельных групп определённых центров
+    var seenAll = {}, groups = 0;
+    Object.keys(def).forEach(function (c) { if (!seenAll[c]) { groups++; var r = reach(c); Object.keys(r).forEach(function (k) { seenAll[k] = 1; }); } });
+    var defName = ['нет определённости', 'единичная', 'расщеплённая (2 части)', 'тройная', 'четверная'][Math.min(groups, 4)];
+    return {
+      designJ: Jd, P: P, D: Dz, chans: chans, def: Object.keys(HD_CENTERS).filter(function (c) { return def[c]; }), type: type, auth: auth,
+      profile: P[0].line + '/' + Dz[0].line, cross: [P[0].gate, P[1].gate, Dz[0].gate, Dz[1].gate], definition: defName
+    };
+  }
+
+  return {
+    SIGNS: SIGNS, SIGN_EL: SIGN_EL, SIGN_MODE: SIGN_MODE, SIGN_TXT: SIGN_TXT, BODY_RU: BODY_RU, BODY_TXT: BODY_TXT, HOUSE_TXT: HOUSE_TXT,
+    fmtLon: fmtLon, signOf: signOf, reduce: reduce, dsum: dsum, NUM_TXT: NUM_TXT, lifePath: lifePath, pythagoras: pythagoras, PYTH_CELL: PYTH_CELL,
+    PYTH_LINES: PYTH_LINES, nameNumbers: nameNumbers, destinyMatrix: destinyMatrix, ARCANA: ARCANA, aspects: aspects, balance: balance, moonPhase: moonPhase,
+    RASHI: RASHI, NAK: NAK, vedic: vedic, STEMS: STEMS, STEM_HZ: STEM_HZ, BR_HZ: BR_HZ, BRANCHES: BRANCHES, ANIMALS: ANIMALS, ANIMAL_TXT: ANIMAL_TXT,
+    ELEM: ELEM, ELEM_TXT: ELEM_TXT, BR_ELEM: BR_ELEM, DM_TXT: DM_TXT, stemEl: stemEl, cny: cny, chinese: chinese,
+    humanDesign: humanDesign, HD_CENTERS: HD_CENTERS, HD_CH: HD_CH, HD_TYPE_TXT: HD_TYPE_TXT, HD_LINE: HD_LINE, gateOf: gateOf
+  };
+})();
+
+</script>
+<script>
+/* Визуальный слой: фон, старт-экран, SVG-графика разделов, поэтапное появление. Расчётов не содержит. */
+var Viz = (function () {
+  'use strict';
+  var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var VS = '︎'; // текстовое (не эмодзи) начертание знаков на iOS
+  var SIGN_G = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
+  var BODY_G = { sun: '☉', moon: '☽', mercury: '☿', venus: '♀', mars: '♂', jupiter: '♃', saturn: '♄', uranus: '♅', neptune: '♆', pluto: '♇', node: '☊' };
+  var EL_COL = ['#e0705a', '#c9a24a', '#7fb0e0', '#5aa0a8']; // огонь, земля, воздух, вода (по знаку % 4)
+  function f(n) { return Math.round(n * 10) / 10; }
+  function rev(x) { x %= 360; return x < 0 ? x + 360 : x; }
+
+  /* ---------- Фон: звёзды с параллаксом (canvas) ---------- */
+  function stars() {
+    var cv = document.getElementById('sky'); if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 2), W, H, layers = [], col = '255,255,255', run = false, last = -1;
+    function seed(n, k) { var a = []; for (var i = 0; i < n; i++) a.push({ x: Math.random(), y: Math.random(), r: (0.4 + Math.random() * 0.9) * k, t: Math.random() * 6.28, s: 0.5 + Math.random() * 1.5 }); return a; }
+    function size() {
+      W = window.innerWidth; H = window.innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var c = getComputedStyle(document.documentElement).getPropertyValue('--star').trim(); col = c || col;
+    }
+    layers = [{ p: seed(90, 0.8), k: 0.04 }, { p: seed(55, 1.1), k: 0.10 }, { p: seed(25, 1.5), k: 0.18 }];
+    function draw(time) {
+      var sy = window.scrollY || 0; ctx.clearRect(0, 0, W, H);
+      for (var l = 0; l < layers.length; l++) {
+        var L = layers[l], off = sy * L.k;
+        for (var i = 0; i < L.p.length; i++) {
+          var s = L.p[i], y = (s.y * H - off) % H; if (y < 0) y += H;
+          var a = RM ? 0.7 : 0.45 + 0.45 * Math.sin(s.t + time * 0.001 * s.s);
+          ctx.fillStyle = 'rgba(' + col + ',' + a.toFixed(2) + ')';
+          ctx.fillRect(s.x * W, y, s.r, s.r);
+        }
+      }
+    }
+    function loop(t) { if (!run) return; draw(t); requestAnimationFrame(loop); }
+    function start() { if (RM) { draw(0); return; } if (!run) { run = true; requestAnimationFrame(loop); } }
+    var want = false;
+    function setOn(v) { want = v; if (v) { size(); start(); } else { run = false; } }
+    skyOn = setOn; size();
+    window.addEventListener('resize', function () { size(); if (RM) draw(0); });
+    if (RM) window.addEventListener('scroll', function () { draw(0); }, { passive: true });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) run = false; else if (want) start(); });
+    Viz.refreshSky = function () { size(); if (RM) draw(0); };
+  }
+
+  /* ---------- Старт-экран ---------- */
+  function splash() {
+    var el = document.getElementById('splash'); if (!el) return;
+    if (RM) { el.remove(); return; }
+    var ring = '';
+    for (var i = 0; i < 12; i++) { var a = (i * 30 - 90) * Math.PI / 180; ring += '<text x="' + f(100 + 82 * Math.cos(a)) + '" y="' + f(100 + 82 * Math.sin(a)) + '" class="sg">' + SIGN_G[i] + VS + '</text>'; }
+    el.querySelector('.sp-ring').innerHTML = ring;
+    function hide() { if (el.classList.contains('out')) return; el.classList.add('out'); setTimeout(function () { el.remove(); }, 700); }
+    el.addEventListener('click', hide); setTimeout(hide, 2200);
+  }
+
+  /* ---------- Нумерология: сакральная геометрия и светящееся число ---------- */
+  function flower(cx, cy, r) {
+    var s = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>';
+    for (var i = 0; i < 6; i++) { var a = i * Math.PI / 3; s += '<circle cx="' + f(cx + r * Math.cos(a)) + '" cy="' + f(cy + r * Math.sin(a)) + '" r="' + r + '"/>'; }
+    for (i = 0; i < 6; i++) { a = i * Math.PI / 3 + Math.PI / 6; s += '<circle cx="' + f(cx + r * Math.sqrt(3) * Math.cos(a)) + '" cy="' + f(cy + r * Math.sqrt(3) * Math.sin(a)) + '" r="' + r + '" class="o2"/>'; }
+    return s + '<circle cx="' + cx + '" cy="' + cy + '" r="' + f(r * 2.7) + '" class="o3"/>';
+  }
+  function numHero(n, label) {
+    return '<div class="num-hero"><svg class="geo" viewBox="0 0 200 200" aria-hidden="true"><g class="geo-r">' + flower(100, 100, 26) +
+      '<polygon points="100,30 160.6,135 39.4,135" class="tri"/><polygon points="100,170 39.4,65 160.6,65" class="tri"/></g></svg>' +
+      '<div class="glow-num" data-count="' + n + '">' + n + '</div><div class="num-cap">' + label + '</div></div>';
+  }
+
+  /* ---------- Западная: колесо зодиака ---------- */
+  function wheel(pos, houses, asp) {
+    var C = 170, R0 = 162, R1 = 136, R2 = 112, RP = 94, RA = 66, asc = houses ? houses.asc : 0;
+    function P(lon, r) { var t = (180 + lon - asc) * Math.PI / 180; return [C + r * Math.cos(t), C - r * Math.sin(t)]; }
+    function seg(lon, r1, r2, cls) { var a = P(lon, r1), b = P(lon, r2); return '<line x1="' + f(a[0]) + '" y1="' + f(a[1]) + '" x2="' + f(b[0]) + '" y2="' + f(b[1]) + '" class="' + cls + '"/>'; }
+    var s = '<svg class="wheel" viewBox="0 0 340 340" role="img" aria-label="Колесо натальной карты">';
+    // вращающееся декоративное кольцо делений
+    s += '<g class="deco">'; for (var d = 0; d < 360; d += 5) { var a1 = P(d, R0 + 4), b1 = P(d, R0 + (d % 30 ? 7 : 10)); s += '<line x1="' + f(a1[0]) + '" y1="' + f(a1[1]) + '" x2="' + f(b1[0]) + '" y2="' + f(b1[1]) + '"/>'; } s += '</g>';
+    s += '<g class="wheel-in">';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="' + R0 + '" class="rim"/><circle cx="' + C + '" cy="' + C + '" r="' + R1 + '" class="rim"/><circle cx="' + C + '" cy="' + C + '" r="' + R2 + '" class="rim2"/><circle cx="' + C + '" cy="' + C + '" r="' + RA + '" class="rim2"/>';
+    for (var i = 0; i < 12; i++) {
+      // сектор знака: дуга-заливка по стихии
+      var p1 = P(i * 30, R0), p2 = P(i * 30 + 30, R0), q1 = P(i * 30 + 30, R1), q2 = P(i * 30, R1);
+      s += '<path d="M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + R0 + ' ' + R0 + ' 0 0 0 ' + f(p2[0]) + ' ' + f(p2[1]) + ' L' + f(q1[0]) + ' ' + f(q1[1]) + ' A' + R1 + ' ' + R1 + ' 0 0 1 ' + f(q2[0]) + ' ' + f(q2[1]) + 'Z" fill="' + EL_COL[i % 4] + '" class="sec"/>';
+      s += seg(i * 30, R1, R0, 'sdiv');
+      var g = P(i * 30 + 15, (R0 + R1) / 2);
+      s += '<text x="' + f(g[0]) + '" y="' + f(g[1]) + '" class="sgl" fill="' + EL_COL[i % 4] + '">' + SIGN_G[i] + VS + '</text>';
+    }
+    if (houses) {
+      houses.cusps.forEach(function (c, k) {
+        s += seg(c, RA, R1, k % 3 === 0 ? 'cusp ax' : 'cusp');
+        var nx = houses.cusps[(k + 1) % 12], mid = c + rev(nx - c) / 2, t = P(mid, RA + 10);
+        s += '<text x="' + f(t[0]) + '" y="' + f(t[1]) + '" class="hn">' + (k + 1) + '</text>';
+      });
+      var aL = P(houses.asc, R0 + 2), mL = P(houses.mc, R0 + 2);
+      s += '<text x="' + f(aL[0] - 12) + '" y="' + f(aL[1]) + '" class="axl">ASC</text><text x="' + f(mL[0]) + '" y="' + f(mL[1] - 10) + '" class="axl">MC</text>';
+    }
+    // аспекты
+    var AC = { 'соединение': '#e8d28a', 'оппозиция': '#ff7a7a', 'квадрат': '#ff7a7a', 'трин': '#6fd3b0', 'секстиль': '#7fb0ff' };
+    s += '<g class="asps">';
+    asp.forEach(function (x, k) {
+      if (x.name === 'соединение') return;
+      var a = P(pos[x.a].lon, RA), b = P(pos[x.b].lon, RA);
+      s += '<path pathLength="1" d="M' + f(a[0]) + ' ' + f(a[1]) + 'L' + f(b[0]) + ' ' + f(b[1]) + '" stroke="' + AC[x.name] + '" class="asp" style="animation-delay:' + (1.1 + k * 0.08).toFixed(2) + 's"/>';
+    });
+    s += '</g>';
+    // планеты с разведением наложений
+    var keys = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'node'];
+    var arr = keys.map(function (k) { return { k: k, lon: pos[k].lon, d: pos[k].lon }; }).sort(function (a, b) { return a.lon - b.lon; });
+    for (var it = 0; it < 30; it++) {
+      var moved = false;
+      for (var j = 0; j < arr.length; j++) {
+        var A = arr[j], B = arr[(j + 1) % arr.length], gap = rev(B.d - A.d);
+        if (gap < 8) { var push = (8 - gap) / 2; A.d -= push; B.d += push; moved = true; }
+      }
+      if (!moved) break;
+    }
+    arr.forEach(function (x, k) {
+      var t = P(x.lon, R2), t2 = P(x.lon, R2 - 6), g = P(x.d, RP);
+      s += '<g class="pl" style="animation-delay:' + (0.6 + k * 0.07).toFixed(2) + 's"><line x1="' + f(t[0]) + '" y1="' + f(t[1]) + '" x2="' + f(t2[0]) + '" y2="' + f(t2[1]) + '" class="tick"/>' +
+        '<text x="' + f(g[0]) + '" y="' + f(g[1]) + '" class="plg' + (x.k === 'sun' || x.k === 'moon' ? ' lum' : '') + '">' + BODY_G[x.k] + VS + '</text></g>';
+    });
+    s += '</g></svg>';
+    return '<div class="wheel-wrap">' + s + '</div><p class="legend"><i style="background:#6fd3b0"></i>трин <i style="background:#7fb0ff"></i>секстиль <i style="background:#ff7a7a"></i>квадрат, оппозиция' + (houses ? '' : ' · без времени и места колесо ориентировано от 0° Овна') + '</p>';
+  }
+
+  /* ---------- Китай: пять стихий, фонарики, облака ---------- */
+  var E5 = [['木', 'Дерево', '#5fb36b'], ['火', 'Огонь', '#e2553f'], ['土', 'Земля', '#c99a3e'], ['金', 'Металл', '#d9d4c3'], ['水', 'Вода', '#4a8fd1']];
+  function elements(cnt) {
+    var C = 130, R = 88;
+    // порядок по кругу: Огонь сверху, далее по часовой Земля, Металл, Вода, Дерево
+    var order = [1, 2, 3, 4, 0], xy = {};
+    order.forEach(function (e, k) { var a = (-90 + 72 * k) * Math.PI / 180; xy[e] = [C + R * Math.cos(a), C + R * Math.sin(a)]; });
+    var s = '<svg class="five" viewBox="0 0 260 260" role="img" aria-label="Баланс пяти стихий">';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="' + R + '" class="gen" pathLength="1"/>';
+    var ctrl = [[0, 2], [2, 4], [4, 1], [1, 3], [3, 0]]; // дерево→земля→вода→огонь→металл→дерево
+    ctrl.forEach(function (p, k) { var a = xy[p[0]], b = xy[p[1]]; s += '<path pathLength="1" class="ctl" style="animation-delay:' + (0.5 + k * 0.12).toFixed(2) + 's" d="M' + f(a[0]) + ' ' + f(a[1]) + 'L' + f(b[0]) + ' ' + f(b[1]) + '"/>'; });
+    for (var e = 0; e < 5; e++) {
+      var r = 15 + 5 * Math.min(cnt[e], 5), p = xy[e];
+      s += '<g class="node" style="animation-delay:' + (0.2 + e * 0.12).toFixed(2) + 's;transform-origin:' + f(p[0]) + 'px ' + f(p[1]) + 'px"><circle cx="' + f(p[0]) + '" cy="' + f(p[1]) + '" r="' + r + '" fill="' + E5[e][2] + '" class="' + (cnt[e] ? '' : 'zero') + '"/>' +
+        '<text x="' + f(p[0]) + '" y="' + f(p[1] + 1) + '" class="hzn">' + E5[e][0] + '</text><text x="' + f(p[0]) + '" y="' + f(p[1] + r + 12) + '" class="cap">' + E5[e][1] + ' ' + cnt[e] + '</text></g>';
+    }
+    return s + '</svg><p class="legend">Круг — порождающий цикл (Дерево → Огонь → Земля → Металл → Вода), звезда — цикл сдерживания; размер — число стихий в столпах.</p>';
+  }
+  function lantern(x, delay) {
+    return '<svg class="lantern" style="left:' + x + '%;animation-delay:' + delay + 's" viewBox="0 0 30 52" aria-hidden="true"><line x1="15" y1="0" x2="15" y2="8" stroke="#d9b45a"/><rect x="9" y="7" width="12" height="4" rx="1" fill="#d9b45a"/>' +
+      '<ellipse cx="15" cy="25" rx="13" ry="15" fill="#d8402f"/><path d="M15 10 V40 M8 13 Q4 25 8 37 M22 13 Q26 25 22 37" stroke="#9c2418" fill="none"/><rect x="10" y="39" width="10" height="4" rx="1" fill="#d9b45a"/><line x1="15" y1="43" x2="15" y2="52" stroke="#d9b45a"/></svg>';
+  }
+  function cnDecor() {
+    var cloud = '<svg class="cloud" viewBox="0 0 120 40" aria-hidden="true"><path d="M10 30 Q10 18 24 20 Q28 6 44 12 Q56 2 68 14 Q84 8 88 22 Q104 20 106 30 Z" fill="none" stroke="#e8c36a" stroke-width="1.5"/><path d="M30 30 Q34 24 42 26 M60 22 Q66 16 74 22" fill="none" stroke="#e8c36a"/></svg>';
+    return '<div class="cn-deco" aria-hidden="true">' + lantern(78, 0) + lantern(90, 1.4) + cloud + cloud.replace('class="cloud"', 'class="cloud c2"') + '</div>';
+  }
+
+  /* ---------- Дизайн человека: бодиграф ---------- */
+  var BG = {
+    'Голова': { c: [150, 48], d: 'M150 18 L186 74 L114 74Z', col: '#f3d65b' },
+    'Аджна': { c: [150, 108], d: 'M114 90 L186 90 L150 144Z', col: '#6cc46a' },
+    'Горло': { c: [150, 190], d: 'M125 166 H175 V214 H125Z', col: '#b58a5a' },
+    'G (Я)': { c: [150, 266], d: 'M150 232 L184 266 L150 300 L116 266Z', col: '#f3d65b' },
+    'Сердце (Эго)': { c: [214, 298], d: 'M214 280 L234 314 L194 314Z', col: '#e2553f' },
+    'Сакрал': { c: [150, 358], d: 'M125 334 H175 V382 H125Z', col: '#e2553f' },
+    'Селезёнка': { c: [48, 340], d: 'M22 300 L22 380 L84 340Z', col: '#b58a5a' },
+    'Солнечное сплетение': { c: [252, 340], d: 'M278 300 L278 380 L216 340Z', col: '#b58a5a' },
+    'Корень': { c: [150, 420], d: 'M125 398 H175 V442 H125Z', col: '#b58a5a' }
+  };
+  function bodygraph(h) {
+    var g2c = {}; Object.keys(Sys.HD_CENTERS).forEach(function (c) { Sys.HD_CENTERS[c].forEach(function (g) { g2c[g] = c; }); });
+    var defCh = {}; h.chans.forEach(function (c) { defCh[c[0] + '-' + c[1]] = 1; });
+    var pairs = {}, s = '<svg class="body" viewBox="0 0 300 456" role="img" aria-label="Бодиграф">';
+    Sys.HD_CH.forEach(function (c) { var a = g2c[c[0]], b = g2c[c[1]], k = [a, b].sort().join('|'); (pairs[k] = pairs[k] || []).push(c); });
+    var lines = '', glow = '', n = 0;
+    Object.keys(pairs).forEach(function (k) {
+      var list = pairs[k];
+      list.forEach(function (c, i) {
+        var A = BG[g2c[c[0]]].c, B = BG[g2c[c[1]]].c, dx = B[0] - A[0], dy = B[1] - A[1], L = Math.sqrt(dx * dx + dy * dy), o = (i - (list.length - 1) / 2) * 7;
+        var ox = -dy / L * o, oy = dx / L * o, d = 'M' + f(A[0] + ox) + ' ' + f(A[1] + oy) + 'L' + f(B[0] + ox) + ' ' + f(B[1] + oy);
+        lines += '<path d="' + d + '" class="ch"/>';
+        if (defCh[c[0] + '-' + c[1]]) { glow += '<path pathLength="1" d="' + d + '" class="ch on" style="animation-delay:' + (0.4 + n * 0.15).toFixed(2) + 's, ' + (2 + n * 0.15).toFixed(2) + 's"><title>' + c[0] + '–' + c[1] + '</title></path><path pathLength="1" d="' + d + '" class="flow"/>'; n++; }
+      });
+    });
+    s += '<g>' + lines + '</g><g>' + glow + '</g>';
+    Object.keys(BG).forEach(function (c, i) {
+      var on = h.def.indexOf(c) >= 0, B = BG[c];
+      s += '<path d="' + B.d + '" class="ctr' + (on ? ' on' : '') + '" style="' + (on ? 'fill:' + B.col + ';' : '') + 'animation-delay:' + (0.2 + i * 0.1).toFixed(2) + 's, ' + (2.4 + i * 0.3).toFixed(2) + 's"><title>' + c + (on ? ' — определён' : ' — открыт') + '</title></path>';
+    });
+    return s + '</svg><p class="legend">Цветом — определённые центры, светящиеся линии — определённые каналы; бледные — неактивные.</p>';
+  }
+
+  /* ---------- Появление разделов, навигация, счётчики ---------- */
+  function countUp(el) {
+    var n = +el.getAttribute('data-count'); if (RM || !n) return;
+    var t0 = null; el.textContent = '0';
+    function step(t) { if (!t0) t0 = t; var k = Math.min(1, (t - t0) / 900); el.textContent = Math.round(n * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }
+  /* ---------- Джйотиш: мандала накшатр ---------- */
+  function mandala(nakIdx, rashiIdx, nakName) {
+    var C = 130, s = '<svg class="mandala" viewBox="0 0 260 260" role="img" aria-label="Мандала накшатр"><g class="m-rot">';
+    for (var i = 0; i < 27; i++) {
+      var a0 = (i * 360 / 27 - 90) * Math.PI / 180, a1 = ((i + 1) * 360 / 27 - 90) * Math.PI / 180, r0 = 98, r1 = 122;
+      var d = 'M' + f(C + r0 * Math.cos(a0)) + ' ' + f(C + r0 * Math.sin(a0)) + ' L' + f(C + r1 * Math.cos(a0)) + ' ' + f(C + r1 * Math.sin(a0)) +
+        ' A' + r1 + ' ' + r1 + ' 0 0 1 ' + f(C + r1 * Math.cos(a1)) + ' ' + f(C + r1 * Math.sin(a1)) + ' L' + f(C + r0 * Math.cos(a1)) + ' ' + f(C + r0 * Math.sin(a1)) +
+        ' A' + r0 + ' ' + r0 + ' 0 0 0 ' + f(C + r0 * Math.cos(a0)) + ' ' + f(C + r0 * Math.sin(a0)) + 'Z';
+      s += '<path d="' + d + '" class="nk' + (i === nakIdx ? ' on' : '') + '"/>';
+    }
+    s += '</g><g class="m-rot2">';
+    for (i = 0; i < 12; i++) {
+      var b0 = (i * 30 - 90) * Math.PI / 180, b1 = ((i + 1) * 30 - 90) * Math.PI / 180, q0 = 70, q1 = 92;
+      s += '<path d="M' + f(C + q0 * Math.cos(b0)) + ' ' + f(C + q0 * Math.sin(b0)) + ' L' + f(C + q1 * Math.cos(b0)) + ' ' + f(C + q1 * Math.sin(b0)) + ' A' + q1 + ' ' + q1 + ' 0 0 1 ' + f(C + q1 * Math.cos(b1)) + ' ' + f(C + q1 * Math.sin(b1)) +
+        ' L' + f(C + q0 * Math.cos(b1)) + ' ' + f(C + q0 * Math.sin(b1)) + ' A' + q0 + ' ' + q0 + ' 0 0 0 ' + f(C + q0 * Math.cos(b0)) + ' ' + f(C + q0 * Math.sin(b0)) + 'Z" class="rs' + (i === rashiIdx ? ' on' : '') + '"/>';
+    }
+    s += '</g><g class="lotus">';
+    for (i = 0; i < 16; i++) {
+      var t = i * 22.5;
+      s += '<g transform="rotate(' + t + ' ' + C + ' ' + C + ')"><path class="petal" style="--d:' + (i * 0.05).toFixed(2) + 's;transform-origin:' + C + 'px ' + C + 'px" d="M' + C + ' ' + C + ' C' + (C - 13) + ' ' + (C - 26) + ' ' + (C - 7) + ' ' + (C - 52) + ' ' + C + ' ' + (C - 62) + ' C' + (C + 7) + ' ' + (C - 52) + ' ' + (C + 13) + ' ' + (C - 26) + ' ' + C + ' ' + C + 'Z"/></g>';
+    }
+    s += '<circle cx="' + C + '" cy="' + C + '" r="9" class="bindu"/></g></svg>';
+    return '<div class="viz m-wrap">' + s + '<div class="m-cap">Луна в накшатре ' + nakName + '</div></div>';
+  }
+  function ornament() {
+    var s = '<svg class="orn viz" viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M0 8 ';
+    for (var x = 0; x < 300; x += 20) s += 'Q' + (x + 5) + ' 0 ' + (x + 10) + ' 8 T' + (x + 20) + ' 8 ';
+    s += '"/>';
+    for (x = 10; x < 300; x += 20) s += '<circle cx="' + x + '" cy="8" r="1.8"/>';
+    return s + '</svg>';
+  }
+
+  /* ---------- Вкладки ---------- */
+  var skyOn = null;
+  function show(root, id, scroll) {
+    var tabs = root.querySelectorAll('.tab');
+    Array.prototype.forEach.call(tabs, function (t) { var on = t.getAttribute('data-tab') === id; t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); if (on) { var bar = t.parentNode; bar.scrollLeft = Math.max(0, t.offsetLeft - 16); } });
+    var panel = null;
+    Array.prototype.forEach.call(root.querySelectorAll('.panel'), function (p) { var on = p.id === 'p-' + id; p.hidden = !on; if (on) panel = p; p.classList.remove('shown'); });
+    document.documentElement.setAttribute('data-tab', id);
+    if (skyOn) skyOn(id === 'west');
+    if (!panel) return;
+    var cards = panel.querySelectorAll('.card');
+    Array.prototype.forEach.call(cards, function (c) {
+      c.classList.remove('in');
+      Array.prototype.forEach.call(c.children, function (ch, i) { ch.style.setProperty('--i', Math.min(i, 14)); });
+    });
+    void panel.offsetWidth;
+    panel.classList.add('shown');
+    Array.prototype.forEach.call(cards, function (c) { c.classList.add('in'); var n = c.querySelector('.glow-num'); if (n) countUp(n); });
+    if (scroll) { var bar = document.getElementById('tabs'); if (bar) bar.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); }
+  }
+  function tabs(root) {
+    root.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-tab]'); if (!t || !root.contains(t)) return;
+      show(root, t.getAttribute('data-tab'), t.classList.contains('open'));
+    });
+    show(root, 'sum', false);
+  }
+  function init() { stars(); splash(); }
+  return { init: init, numHero: numHero, wheel: wheel, elements: elements, cnDecor: cnDecor, bodygraph: bodygraph, mandala: mandala, ornament: ornament, tabs: tabs, RM: RM };
+})();
+
+</script>
+<script>
+/* Интерфейс */
+(function () {
+  'use strict';
+  var CITIES = [
+    ['Москва', 55.756, 37.617, 'Europe/Moscow'], ['Санкт-Петербург', 59.939, 30.316, 'Europe/Moscow'], ['Новосибирск', 55.030, 82.920, 'Asia/Novosibirsk'],
+    ['Екатеринбург', 56.838, 60.605, 'Asia/Yekaterinburg'], ['Казань', 55.796, 49.106, 'Europe/Moscow'], ['Нижний Новгород', 56.327, 44.006, 'Europe/Moscow'],
+    ['Челябинск', 55.160, 61.403, 'Asia/Yekaterinburg'], ['Самара', 53.195, 50.100, 'Europe/Samara'], ['Тольятти', 53.508, 49.420, 'Europe/Samara'],
+    ['Омск', 54.989, 73.369, 'Asia/Omsk'], ['Ростов-на-Дону', 47.222, 39.720, 'Europe/Moscow'], ['Уфа', 54.735, 55.959, 'Asia/Yekaterinburg'],
+    ['Красноярск', 56.015, 92.893, 'Asia/Krasnoyarsk'], ['Пермь', 58.010, 56.229, 'Asia/Yekaterinburg'], ['Воронеж', 51.661, 39.200, 'Europe/Moscow'],
+    ['Волгоград', 48.708, 44.513, 'Europe/Volgograd'], ['Краснодар', 45.035, 38.975, 'Europe/Moscow'], ['Саратов', 51.533, 46.034, 'Europe/Saratov'],
+    ['Тюмень', 57.153, 65.534, 'Asia/Yekaterinburg'], ['Ижевск', 56.852, 53.205, 'Europe/Samara'], ['Барнаул', 53.348, 83.780, 'Asia/Barnaul'],
+    ['Ульяновск', 54.314, 48.403, 'Europe/Ulyanovsk'], ['Иркутск', 52.287, 104.305, 'Asia/Irkutsk'], ['Хабаровск', 48.480, 135.072, 'Asia/Vladivostok'],
+    ['Владивосток', 43.116, 131.882, 'Asia/Vladivostok'], ['Ярославль', 57.626, 39.894, 'Europe/Moscow'], ['Махачкала', 42.983, 47.504, 'Europe/Moscow'],
+    ['Томск', 56.484, 84.948, 'Asia/Tomsk'], ['Оренбург', 51.768, 55.097, 'Asia/Yekaterinburg'], ['Кемерово', 55.355, 86.087, 'Asia/Novokuznetsk'],
+    ['Новокузнецк', 53.757, 87.136, 'Asia/Novokuznetsk'], ['Рязань', 54.630, 39.742, 'Europe/Moscow'], ['Астрахань', 46.348, 48.033, 'Europe/Astrakhan'],
+    ['Пенза', 53.195, 45.018, 'Europe/Moscow'], ['Липецк', 52.609, 39.599, 'Europe/Moscow'], ['Тула', 54.193, 37.618, 'Europe/Moscow'],
+    ['Киров', 58.604, 49.668, 'Europe/Kirov'], ['Чебоксары', 56.146, 47.251, 'Europe/Moscow'], ['Калининград', 54.710, 20.452, 'Europe/Kaliningrad'],
+    ['Курск', 51.730, 36.193, 'Europe/Moscow'], ['Магнитогорск', 53.407, 58.980, 'Asia/Yekaterinburg'], ['Сочи', 43.585, 39.723, 'Europe/Moscow'],
+    ['Ставрополь', 45.044, 41.969, 'Europe/Moscow'], ['Белгород', 50.595, 36.587, 'Europe/Moscow'], ['Мурманск', 68.970, 33.075, 'Europe/Moscow'],
+    ['Архангельск', 64.539, 40.516, 'Europe/Moscow'], ['Тверь', 56.859, 35.912, 'Europe/Moscow'], ['Смоленск', 54.782, 32.045, 'Europe/Moscow'],
+    ['Владимир', 56.129, 40.407, 'Europe/Moscow'], ['Калуга', 54.513, 36.261, 'Europe/Moscow'], ['Иваново', 57.000, 40.973, 'Europe/Moscow'],
+    ['Брянск', 53.243, 34.364, 'Europe/Moscow'], ['Орёл', 52.968, 36.069, 'Europe/Moscow'], ['Тамбов', 52.721, 41.452, 'Europe/Moscow'],
+    ['Вологда', 59.220, 39.891, 'Europe/Moscow'], ['Череповец', 59.127, 37.909, 'Europe/Moscow'], ['Петрозаводск', 61.785, 34.346, 'Europe/Moscow'],
+    ['Сыктывкар', 61.668, 50.836, 'Europe/Moscow'], ['Курган', 55.441, 65.341, 'Asia/Yekaterinburg'], ['Сургут', 61.254, 73.396, 'Asia/Yekaterinburg'],
+    ['Нижний Тагил', 57.910, 59.981, 'Asia/Yekaterinburg'], ['Выкса', 55.320, 42.170, 'Europe/Moscow'], ['Таганрог', 47.209, 38.936, 'Europe/Moscow'],
+    ['Волжский', 48.786, 44.751, 'Europe/Volgograd'], ['Набережные Челны', 55.743, 52.396, 'Europe/Moscow'], ['Якутск', 62.028, 129.733, 'Asia/Yakutsk'],
+    ['Чита', 52.034, 113.500, 'Asia/Chita'], ['Улан-Удэ', 51.834, 107.584, 'Asia/Irkutsk'], ['Южно-Сахалинск', 46.959, 142.738, 'Asia/Sakhalin'],
+    ['Магадан', 59.561, 150.808, 'Asia/Magadan'], ['Петропавловск-Камчатский', 53.024, 158.643, 'Asia/Kamchatka'], ['Норильск', 69.349, 88.201, 'Asia/Krasnoyarsk'],
+    ['Минск', 53.902, 27.562, 'Europe/Minsk'], ['Киев', 50.450, 30.523, 'Europe/Kiev'], ['Харьков', 49.994, 36.230, 'Europe/Kiev'], ['Одесса', 46.482, 30.723, 'Europe/Kiev'],
+    ['Донецк', 48.016, 37.803, 'Europe/Kiev'], ['Кишинёв', 47.011, 28.863, 'Europe/Chisinau'], ['Рига', 56.950, 24.105, 'Europe/Riga'], ['Вильнюс', 54.687, 25.280, 'Europe/Vilnius'],
+    ['Таллин', 59.437, 24.754, 'Europe/Tallinn'], ['Тбилиси', 41.716, 44.783, 'Asia/Tbilisi'], ['Ереван', 40.177, 44.513, 'Asia/Yerevan'], ['Баку', 40.409, 49.867, 'Asia/Baku'],
+    ['Алматы', 43.238, 76.946, 'Asia/Almaty'], ['Астана', 51.169, 71.449, 'Asia/Almaty'], ['Караганда', 49.807, 73.088, 'Asia/Almaty'], ['Ташкент', 41.300, 69.240, 'Asia/Tashkent'],
+    ['Бишкек', 42.875, 74.590, 'Asia/Bishkek'], ['Душанбе', 38.560, 68.774, 'Asia/Dushanbe'], ['Ашхабад', 37.960, 58.326, 'Asia/Ashgabat'],
+    ['Лондон', 51.507, -0.128, 'Europe/London'], ['Берлин', 52.520, 13.405, 'Europe/Berlin'], ['Париж', 48.857, 2.352, 'Europe/Paris'], ['Рим', 41.903, 12.496, 'Europe/Rome'],
+    ['Мадрид', 40.417, -3.704, 'Europe/Madrid'], ['Варшава', 52.230, 21.012, 'Europe/Warsaw'], ['Прага', 50.075, 14.438, 'Europe/Prague'], ['Стамбул', 41.008, 28.978, 'Europe/Istanbul'],
+    ['Тель-Авив', 32.085, 34.781, 'Asia/Jerusalem'], ['Дубай', 25.205, 55.271, 'Asia/Dubai'], ['Пекин', 39.904, 116.407, 'Asia/Shanghai'], ['Шанхай', 31.230, 121.474, 'Asia/Shanghai'],
+    ['Дели', 28.614, 77.209, 'Asia/Kolkata'], ['Токио', 35.676, 139.650, 'Asia/Tokyo'], ['Нью-Йорк', 40.713, -74.006, 'America/New_York'], ['Лос-Анджелес', 34.052, -118.244, 'America/Los_Angeles']
+  ];
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtJ(J, off) { var d = Core.jdToDate(J + (off || 0) / 24), h = Math.floor(d.h), mi = Math.floor((d.h - h) * 60); return pad(d.d) + '.' + pad(d.m) + '.' + d.y + ' ' + pad(h) + ':' + pad(mi); }
+  function fmtD(J) { var d = Core.jdToDate(J); return pad(d.d) + '.' + pad(d.m) + '.' + d.y; }
+  function badge(kind) { return kind === 'calc' ? '<span class="bdg calc">расчёт</span>' : '<span class="bdg intr">интерпретация</span>'; }
+
+  // Смещение пояса через встроенную в браузер базу часовых поясов (Intl, без сети)
+  function zoneOffsetMin(zone, ms) {
+    var f = new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    var p = {}; f.formatToParts(new Date(ms)).forEach(function (x) { p[x.type] = x.value; });
+    var asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
+    return Math.round((asUTC - ms) / 60000);
+  }
+  function localToUTC(y, m, d, h, mi, zone) {
+    var guess = Date.UTC(y, m - 1, d, h, mi), o1 = zoneOffsetMin(zone, guess), t = guess - o1 * 60000, o2 = zoneOffsetMin(zone, t);
+    if (o2 !== o1) t = guess - o2 * 60000;
+    return { ms: t, off: o2 };
+  }
+
+  function fillCities() {
+    var dl = $('cities'); CITIES.forEach(function (c) { var o = document.createElement('option'); o.value = c[0]; dl.appendChild(o); });
+  }
+  function onCity() {
+    var v = $('city').value.trim().toLowerCase(), c = CITIES.filter(function (x) { return x[0].toLowerCase() === v; })[0];
+    if (c) { $('lat').value = c[1]; $('lon').value = c[2]; $('zone').value = c[3]; $('tzman').value = ''; }
+  }
+
+  // ---------- Хранение (только по галочке) ----------
+  var KEY = 'psy-profile-v1';
+  function save(data) { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { } }
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function forget() { try { localStorage.removeItem(KEY); } catch (e) { } }
+
+  function readForm() {
+    return { date: $('date').value, time: $('time').value, name: $('name').value, city: $('city').value, lat: $('lat').value, lon: $('lon').value,
+      zone: $('zone').value, tzman: $('tzman').value, hs: $('hs').value };
+  }
+  function writeForm(d) { ['date', 'time', 'name', 'city', 'lat', 'lon', 'zone', 'tzman', 'hs'].forEach(function (k) { if (d[k] != null) $(k).value = d[k]; }); }
+
+  function compute() {
+    var f = readForm(), err = [];
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(f.date)) { $('out').innerHTML = '<p class="err">Укажите дату рождения.</p>'; return; }
+    var Y = +f.date.slice(0, 4), M = +f.date.slice(5, 7), Dd = +f.date.slice(8, 10);
+    var hasTime = /^\d{2}:\d{2}/.test(f.time), hh = hasTime ? +f.time.slice(0, 2) : 12, mm = hasTime ? +f.time.slice(3, 5) : 0;
+    var lat = parseFloat(String(f.lat).replace(',', '.')), lon = parseFloat(String(f.lon).replace(',', '.'));
+    var hasPlace = isFinite(lat) && isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+    var tzm = parseFloat(String(f.tzman).replace(',', '.')), offMin, tzNote;
+    if (isFinite(tzm)) { offMin = Math.round(tzm * 60); tzNote = 'задано вручную'; }
+    else if (f.zone) {
+      try { offMin = localToUTC(Y, M, Dd, hh, mm, f.zone).off; tzNote = 'по базе часовых поясов браузера (' + esc(f.zone) + ')'; }
+      catch (e) { offMin = 180; tzNote = 'пояс не распознан, принято UTC+3'; }
+    } else { offMin = 180; tzNote = 'не задан, принято UTC+3 (Москва)'; }
+    var J = Core.jd(Y, M, Dd, hh + mm / 60 - offMin / 60);
+    var civil = { y: Y, m: M, d: Dd, h: hh + mm / 60 };
+    if (f.remember === undefined && $('remember').checked) save(f);
+    var H = [];
+    var offTxt = 'UTC' + (offMin >= 0 ? '+' : '−') + (Math.abs(offMin) / 60);
+    H.push('<section class="card" id="src"><h2>Исходные данные</h2>' + badge('calc') +
+      '<table class="kv"><tr><td>Дата</td><td>' + pad(Dd) + '.' + pad(M) + '.' + Y + '</td></tr>' +
+      '<tr><td>Время</td><td>' + (hasTime ? pad(hh) + ':' + pad(mm) + ' (' + offTxt + ', ' + tzNote + ')' : 'не задано — для расчёта принят полдень ' + offTxt) + '</td></tr>' +
+      '<tr><td>Момент UT</td><td>' + fmtJ(J, 0) + '</td></tr><tr><td>Юлианская дата</td><td>' + J.toFixed(5) + '</td></tr>' +
+      '<tr><td>Место</td><td>' + (hasPlace ? (esc(f.city || 'координаты') + ': ' + lat.toFixed(3) + '°, ' + lon.toFixed(3) + '°') : 'не задано — асцендент и дома не считаются') + '</td></tr></table>' +
+      (hasTime && f.zone && !isFinite(tzm) ? '<p class="note">Проверьте смещение: для СССР до 1991 г. и «декретного» времени база браузера обычно верна, но при сомнении задайте смещение вручную (например, +4 для московского летнего времени 1981–1991).</p>' : '') +
+      '</section>');
+
+    var srcHtml = H.join('');
+    // ---------- Полнота данных по системам ----------
+    var need = hasTime && hasPlace ? '' : (!hasTime && !hasPlace ? 'нужно время и место' : (!hasTime ? 'нужно время' : 'нужно место'));
+    var needT = hasTime ? '' : 'нужно время';
+    var P = Core.positions(J), lp = Sys.lifePath(Y, M, Dd), py = Sys.pythagoras(Y, M, Dd);
+    var asc = hasTime && hasPlace ? Core.angles(J, lat, lon).asc : null;
+    var vd = Sys.vedic(J, P, asc), cz = Sys.chinese(J, civil, hasPlace ? lon : null, hasTime), hd = Sys.humanDesign(J);
+    var strong = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(function (k) { return py.cnt[k] >= 3; }), empty = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(function (k) { return !py.cnt[k]; });
+    var S = Sys.SIGNS;
+    var systems = [
+      { id: 'num', tab: 'Нумерология', icon: '∑', need: '', html: numerology(Y, M, Dd, f.name),
+        sum: 'Число жизненного пути <b>' + lp.res.n + '</b> — ' + Sys.NUM_TXT[lp.res.n] + '. Матрица Пифагора: ' + (strong.length ? 'сильные клетки ' + strong.join(', ') : 'выраженных клеток нет') + (empty.length ? '; пустые ' + empty.join(', ') : '') + '.' + (f.name ? '' : ' Имя не введено — числа имени не считались.') },
+      { id: 'west', tab: 'Западная астрология', icon: '☉' + '︎', need: need, html: western(J, hasTime, hasPlace, lat, lon, f.hs, offMin, Y, M, Dd),
+        sum: 'Солнце — <b>' + S[Sys.signOf(P.sun.lon)] + '</b>, Луна — <b>' + S[Sys.signOf(P.moon.lon)] + '</b>' + (hasTime ? '' : ' (без времени возможна соседняя)') + (asc != null ? ', асцендент — <b>' + S[Sys.signOf(asc)] + '</b>' : '') + '. Солнце: ' + Sys.SIGN_TXT[Sys.signOf(P.sun.lon)] + '.' },
+      { id: 'ved', tab: 'Джйотиш', icon: '☽' + '︎', need: need, html: vedicBlock(J, hasTime, hasPlace, lat, lon),
+        sum: 'Луна (раши) — <b>' + Sys.RASHI[Math.floor(vd.sid.moon / 30)] + '</b>, накшатра <b>' + vd.nak + '</b>' + (vd.lagna != null ? ', лагна — <b>' + Sys.RASHI[Math.floor(vd.lagna / 30)] + '</b>' : '') + '. Текущий период даши: ' + (function () { var now = 2440587.5 + Date.now() / 86400000; for (var i = 0; i < vd.periods.length; i++) if (now < vd.periods[i].to) return vd.periods[i].lord; return '—'; })() + '.' },
+      { id: 'cn', tab: 'Ба-цзы', icon: '命', need: needT, html: chineseBlock(J, civil, hasPlace ? lon : null, hasTime),
+        sum: 'Год: <b>' + Sys.ANIMALS[cz.animal] + '</b>, стихия <b>' + Sys.ELEM[Sys.stemEl(cz.yearStem)] + '</b>. Господин дня — <b>' + Sys.STEMS[cz.dayMaster] + '</b> (' + Sys.DM_TXT[cz.dayMaster].split(':')[0] + ').' + (hasTime ? '' : ' Столп часа не определён.') },
+      { id: 'hd', tab: 'Human Design', icon: '◬', need: needT, html: hdBlock(J, hasTime, offMin),
+        sum: 'Тип <b>' + hd.type + '</b>, авторитет — ' + hd.auth.split(' (')[0].toLowerCase() + ', профиль <b>' + hd.profile + '</b>.' + (hasTime ? '' : ' Без времени тип и профиль могут отличаться.') }
+    ];
+    systems.forEach(function (s) {
+      if (s.need) s.html = s.html.replace('</h2>', '</h2><div class="need">⚠︎ ' + s.need + ' — показан частичный расчёт</div>');
+    });
+    var order = systems.filter(function (s) { return !s.need; }).concat(systems.filter(function (s) { return s.need; }));
+    var sumHtml = '<section class="card sum" id="sec-sum"><h2>Сводка</h2><p class="note">Сначала системы, посчитанные полностью, затем частичные. Подробности — во вкладках.</p>' +
+      order.map(function (s, i) {
+        return '<div class="srow" style="animation-delay:' + (0.1 + i * 0.09).toFixed(2) + 's"><div class="sic s-' + s.id + '">' + s.icon + '</div><div class="stx"><div class="sh">' + s.tab +
+          (s.need ? ' <span class="st part">' + s.need + '</span>' : ' <span class="st full">полный расчёт</span>') + '</div><div class="sb">' + s.sum + '</div>' +
+          '<button type="button" class="open" data-tab="' + s.id + '">Открыть отчёт →</button></div></div>';
+      }).join('') + '</section>' + srcHtml + scienceBlock();
+    function actions(all) { return '<div class="acts"><button type="button" class="act" data-act="copy">Скопировать</button><button type="button" class="act" data-act="share">Поделиться</button><button type="button" class="act" data-act="pdf">' + (all ? 'Общий PDF' : 'Скачать PDF') + '</button></div>'; }
+    var note = '<p class="note foot">Трактовки — традиционные; научного подтверждения связи с характером нет (подробнее — во вкладке «Сводка»).</p>';
+    var tabs = [{ id: 'sum', tab: 'Сводка', need: '' }].concat(systems);
+    var out = '<div id="tabs" role="tablist">' + tabs.map(function (t, i) {
+      return '<button type="button" role="tab" class="tab' + (i ? '' : ' on') + '" data-tab="' + t.id + '" aria-selected="' + (i ? 'false' : 'true') + '">' + t.tab + (t.need ? ' <i class="dot" title="' + t.need + '"></i>' : '') + '</button>';
+    }).join('') + '</div>' +
+      '<div class="panel" id="p-sum" role="tabpanel">' + sumHtml + actions(true) + '</div>' +
+      systems.map(function (s) { return '<div class="panel" id="p-' + s.id + '" role="tabpanel" hidden>' + s.html + note + actions(false) + '</div>'; }).join('');
+    $('out').innerHTML = out;
+    Viz.tabs($('out'));
+    $('out').scrollIntoView({ behavior: Viz.RM ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  function numerology(Y, M, D, name) {
+    var lp = Sys.lifePath(Y, M, D), py = Sys.pythagoras(Y, M, D), dm = Sys.destinyMatrix(Y, M, D), s = [];
+    var now = new Date(), cy = now.getFullYear(), pyr = Sys.reduce(Sys.reduce(D).n + Sys.reduce(M).n + Sys.reduce(Sys.dsum(cy)).n, false).n;
+    s.push('<section class="card num" id="sec-num"><h2>Нумерология</h2>' + Viz.numHero(lp.res.n, 'число жизненного пути'));
+    s.push('<h3>Число жизненного пути</h3>' + badge('calc') + '<p class="calc">День ' + D + ' → ' + lp.rd + '; месяц ' + M + ' → ' + lp.rm + '; год ' + Y + ' → ' + Sys.dsum(Y) + ' → ' + lp.ry +
+      '<br>' + lp.rd + ' + ' + lp.rm + ' + ' + lp.ry + ' = ' + lp.sum + ' → <b>' + lp.res.n + '</b>' + (lp.res.steps.length > 1 ? ' (' + lp.res.steps.join(' → ') + ')' : '') +
+      '<br>Другой распространённый способ — сумма всех цифр даты: ' + lp.allDigits + ' → <b>' + lp.allRes.n + '</b>' + (lp.allRes.n !== lp.res.n ? ' (способы расходятся из-за мастер-чисел)' : ' (совпадает)') + '.</p>');
+    s.push(badge('intr') + '<p>' + lp.res.n + ' — ' + Sys.NUM_TXT[lp.res.n] + '.</p><p class="note">В русскоязычной литературе это же число часто называют «числом судьбы»; в западной «Destiny number» — это число имени (ниже).</p>');
+    var bd = Sys.reduce(D, true).n;
+    s.push('<h3>Число дня рождения и личный год</h3>' + badge('calc') + '<p class="calc">День ' + D + ' → <b>' + bd + '</b>. Личный год ' + cy + ': ' + Sys.reduce(D).n + ' + ' + Sys.reduce(M).n + ' + ' + Sys.reduce(Sys.dsum(cy)).n + ' → <b>' + pyr + '</b>.</p>' +
+      badge('intr') + '<p>День: ' + Sys.NUM_TXT[bd] + '. Личный год ' + pyr + ' — по трактовке год темы «' + Sys.NUM_TXT[pyr].split(',')[0] + '».</p>');
+    // Пифагор
+    var c = py.cnt;
+    function cell(k) { return '<td><div class="pn">' + (c[k] ? String(k).repeat(c[k]) : '—') + '</div><div class="cl">' + k + ': ' + Sys.PYTH_CELL[k].split(',')[0] + '</div></td>'; }
+    s.push('<h3>Матрица Пифагора (психоматрица, метод А. Ф. Александрова)</h3>' + badge('calc') +
+      '<p class="calc">Цифры даты: ' + py.dateStr.split('').join(' ') + '<br>1-е рабочее число = сумма цифр = <b>' + py.n[0] + '</b>' +
+      '<br>2-е = сумма цифр 1-го = <b>' + py.n[1] + '</b><br>3-е = 1-е − 2 × ' + py.firstDay + ' (первая значащая цифра дня) = ' + (py.n3raw < 0 ? py.n3raw + ' → по модулю <b>' + py.n[2] + '</b>' : '<b>' + py.n[2] + '</b>') +
+      '<br>4-е = сумма цифр 3-го = <b>' + py.n[3] + '</b><br>В квадрат идут все цифры даты и рабочих чисел, кроме нулей: всего ' + py.total + '.</p>' +
+      '<table class="pyth"><tr>' + cell(1) + cell(4) + cell(7) + '</tr><tr>' + cell(2) + cell(5) + cell(8) + '</tr><tr>' + cell(3) + cell(6) + cell(9) + '</tr></table>');
+    var lines = Sys.PYTH_LINES.map(function (L) { var n = L[1].reduce(function (a, k) { return a + c[k]; }, 0); return '<li>' + L[0] + ': ' + n + '</li>'; }).join('');
+    s.push('<ul class="small">' + lines + '</ul>' + badge('intr') +
+      '<p>По трактовке: пустая клетка — качество выражено слабо, 1–2 цифры — средне, 3 и больше — сильно. Значения клеток: ' +
+      [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (k) { return k + ' — ' + Sys.PYTH_CELL[k]; }).join('; ') + '. Сумма в строке/столбце/диагонали: 0–2 — слабо, 3–4 — средне, 5+ — сильно.</p>' +
+      (Y >= 2000 ? '<p class="note">Для родившихся с 2000 г. у разных авторов есть поправки к 3-му числу; здесь — классический способ.</p>' : ''));
+    // Имя
+    var nn = Sys.nameNumbers(name);
+    if (nn) {
+      s.push('<h3>Числа имени</h3>' + badge('calc') + '<p class="calc">' + esc(nn.letters.join(' ')) + '<br>Все буквы: ' + nn.sums[0] + ' → <b>' + nn.expr.n + '</b> (число выражения / «Destiny»)' +
+        '<br>Гласные: ' + nn.sums[1] + ' → <b>' + nn.soul.n + '</b> (число души)<br>Согласные: ' + nn.sums[2] + ' → <b>' + nn.pers.n + '</b> (число личности)</p>' +
+        '<p class="note">Таблица букв: латиница A=1…I=9, J=1…; кириллица по порядку алфавита А=1…И=9, Й=1… (33 буквы). Y считается согласной. Разные школы используют разные таблицы и форму имени (полное по документам или привычное).</p>' +
+        badge('intr') + '<p>Выражение ' + nn.expr.n + ': ' + Sys.NUM_TXT[nn.expr.n] + '. Душа ' + nn.soul.n + ': ' + (Sys.NUM_TXT[nn.soul.n] || '—') + '. Личность ' + nn.pers.n + ': ' + (Sys.NUM_TXT[nn.pers.n] || '—') + '.</p>');
+    } else s.push('<p class="note">Числа имени: введите имя (по желанию), чтобы посчитать.</p>');
+    s.push('<h3>«Матрица судьбы» (метод Н. Ладини), основные точки</h3>' + badge('calc') +
+      '<p class="calc">A (день) = ' + D + ' → <b>' + dm.A + '</b>; B (месяц) = <b>' + dm.B + '</b>; C (год) = ' + Sys.dsum(Y) + ' → <b>' + dm.C + '</b>; D = A+B+C → <b>' + dm.D + '</b>; центр E = A+B+C+D → <b>' + dm.E + '</b> (числа больше 22 сводятся суммой цифр).</p>' +
+      badge('intr') + '<p>Арканы (названия старших арканов Таро): A — ' + Sys.ARCANA[dm.A] + ', B — ' + Sys.ARCANA[dm.B] + ', C — ' + Sys.ARCANA[dm.C] + ', D — ' + Sys.ARCANA[dm.D] + ', центр — <b>' + Sys.ARCANA[dm.E] + '</b>. Полная «матрица» содержит ещё десятки производных точек; трактовки у авторов различаются.</p>');
+    s.push('</section>');
+    return s.join('');
+  }
+
+  function western(J, hasTime, hasPlace, lat, lon, hs, offMin, Y, M, D) {
+    var pos = Core.positions(J), s = [], keys = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'node'];
+    var houses = null, hsName = '';
+    if (hasTime && hasPlace) {
+      if (hs === 'equal') { houses = Core.equalHouses(J, lat, lon); hsName = 'равнодомная от асцендента'; }
+      else if (hs === 'whole') { houses = Core.wholeSign(J, lat, lon); hsName = 'целые знаки'; }
+      else { houses = Core.placidus(J, lat, lon); hsName = 'Плацидус'; if (!houses) { houses = Core.equalHouses(J, lat, lon); hsName = 'равнодомная (Плацидус не работает за полярным кругом)'; } }
+    }
+    s.push('<section class="card west" id="sec-west"><h2>Западная (тропическая) астрология</h2>' + badge('calc') + Viz.wheel(pos, houses, Sys.aspects(pos)));
+    var moonNote = '';
+    if (!hasTime) {
+      var J0 = Core.jd(Y, M, D, -offMin / 60), J1 = J0 + 1 - 1 / 1440, m0 = Core.geoLon('moon', J0), m1 = Core.geoLon('moon', J1);
+      moonNote = '<p class="note">Время не задано: Луна за сутки прошла от ' + Sys.fmtLon(m0) + ' до ' + Sys.fmtLon(m1) + (Sys.signOf(m0) !== Sys.signOf(m1) ? ' — <b>знак Луны зависит от времени рождения</b>' : ' (знак не меняется)') + '. Асцендент и дома без времени не определяются.</p>';
+    }
+    var rows = keys.map(function (k) {
+      var p = pos[k];
+      return '<tr><td>' + Sys.BODY_RU[k] + '</td><td>' + Sys.fmtLon(p.lon) + (p.retro && k !== 'node' ? ' <span class="r">R</span>' : '') + '</td><td>' + (houses ? Core.houseOf(p.lon, houses.cusps) : '—') + '</td></tr>';
+    }).join('');
+    if (houses) rows += '<tr><td>Асцендент</td><td>' + Sys.fmtLon(houses.asc) + '</td><td>1</td></tr><tr><td>Середина неба (MC)</td><td>' + Sys.fmtLon(houses.mc) + '</td><td>10</td></tr>';
+    s.push('<table class="grid"><tr><th>Объект</th><th>Положение</th><th>Дом</th></tr>' + rows + '</table>' + moonNote +
+      '<p class="note">Тропический зодиак, равноденствие даты; геоцентрические видимые долготы по упрощённой аналитической теории. Погрешность: Луна до ~4′, планеты до ~3′ (сверено с PyEphem на 49 датах 1920–2049). Узел — средний. R — попятное движение.</p>');
+    if (houses) {
+      s.push('<h3>Куспиды домов (' + hsName + ')</h3><table class="grid"><tr><th>Дом</th><th>Куспид</th><th>Дом</th><th>Куспид</th></tr>' +
+        [0, 1, 2, 3, 4, 5].map(function (i) { return '<tr><td>' + (i + 1) + '</td><td>' + Sys.fmtLon(houses.cusps[i]) + '</td><td>' + (i + 7) + '</td><td>' + Sys.fmtLon(houses.cusps[i + 6]) + '</td></tr>'; }).join('') + '</table>');
+    }
+    var bl = Sys.balance(pos, ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']);
+    s.push('<h3>Баланс стихий и крестов (10 планет)</h3><p class="calc">Огонь ' + bl.el[0] + ', Земля ' + bl.el[1] + ', Воздух ' + bl.el[2] + ', Вода ' + bl.el[3] +
+      '; кардинальный ' + bl.mo[0] + ', фиксированный ' + bl.mo[1] + ', мутабельный ' + bl.mo[2] + '.</p>');
+    var ph = Sys.moonPhase(pos.sun.lon, pos.moon.lon);
+    s.push('<p class="calc">Фаза Луны: ' + ph.name + ' (элонгация ' + ph.elong.toFixed(1) + '°).</p>');
+    var asp = Sys.aspects(pos);
+    s.push('<h3>Мажорные аспекты</h3><table class="grid"><tr><th>Пара</th><th>Аспект</th><th>Орб</th></tr>' +
+      asp.map(function (a) { return '<tr><td>' + Sys.BODY_RU[a.a] + ' – ' + Sys.BODY_RU[a.b] + '</td><td>' + a.name + '</td><td>' + a.orb.toFixed(1) + '°</td></tr>'; }).join('') + '</table>' +
+      '<p class="note">Орбы: соединение и оппозиция 8°, трин 7°, квадрат 6°, секстиль 4° (в школах орбы различаются).</p>');
+    // Интерпретация
+    var it = [];
+    it.push('<li><b>Солнце в знаке ' + Sys.SIGNS[Sys.signOf(pos.sun.lon)] + '</b> (' + Sys.BODY_TXT.sun + '): ' + Sys.SIGN_TXT[Sys.signOf(pos.sun.lon)] + '.</li>');
+    it.push('<li><b>Луна в знаке ' + Sys.SIGNS[Sys.signOf(pos.moon.lon)] + '</b> (' + Sys.BODY_TXT.moon + '): ' + Sys.SIGN_TXT[Sys.signOf(pos.moon.lon)] + (hasTime ? '' : ' — при неизвестном времени может быть другой знак') + '.</li>');
+    if (houses) it.push('<li><b>Асцендент ' + Sys.SIGNS[Sys.signOf(houses.asc)] + '</b> (внешняя манера, «как вас видят»): ' + Sys.SIGN_TXT[Sys.signOf(houses.asc)] + '.</li>');
+    ['mercury', 'venus', 'mars', 'jupiter', 'saturn'].forEach(function (k) {
+      var sg = Sys.signOf(pos[k].lon);
+      it.push('<li>' + Sys.BODY_RU[k] + ' (' + Sys.BODY_TXT[k] + ') — ' + Sys.SIGNS[sg] + ': ' + Sys.SIGN_TXT[sg] + (houses ? '; дом ' + Core.houseOf(pos[k].lon, houses.cusps) + ' — ' + Sys.HOUSE_TXT[Core.houseOf(pos[k].lon, houses.cusps) - 1] : '') + '.</li>');
+    });
+    var dom = bl.el.indexOf(Math.max.apply(null, bl.el));
+    it.push('<li>Преобладает стихия «' + Sys.SIGN_EL[dom] + '»' + ' (огонь — энергия, земля — практичность, воздух — идеи и общение, вода — чувства).</li>');
+    asp.slice(0, 5).forEach(function (a) { it.push('<li>' + Sys.BODY_RU[a.a] + ' – ' + Sys.BODY_RU[a.b] + ', ' + a.name + ': ' + a.txt + '.</li>'); });
+    s.push(badge('intr') + '<ul>' + it.join('') + '</ul><p class="note">Уран, Нептун и Плутон в знаках одинаковы у всех родившихся в течение нескольких лет — в трактовке это «поколенческие» черты.</p></section>');
+    return s.join('');
+  }
+
+  function vedicBlock(J, hasTime, hasPlace, lat, lon) {
+    var pos = Core.positions(J), asc = hasTime && hasPlace ? Core.angles(J, lat, lon).asc : null, v = Sys.vedic(J, pos, asc), s = [];
+    var keys = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'node'], RU = { sun: 'Сурья (Солнце)', moon: 'Чандра (Луна)', mars: 'Мангала (Марс)', mercury: 'Будха (Меркурий)', jupiter: 'Гуру (Юпитер)', venus: 'Шукра (Венера)', saturn: 'Шани (Сатурн)', node: 'Раху (сев. узел)' };
+    function sfmt(l) { var sg = Math.floor(l / 30), x = l - sg * 30, d = Math.floor(x), m = Math.floor((x - d) * 60); return d + '°' + pad(m) + '′ ' + Sys.RASHI[sg]; }
+    s.push('<section class="card ved" id="sec-ved">' + Viz.ornament() + '<h2>Ведическая астрология (джйотиш)</h2>' + badge('calc') + Viz.mandala(v.nakIdx, Math.floor(v.sid.moon / 30), v.nak) +
+      '<p class="calc">Сидерический зодиак: долгота = тропическая − айанамша Лахири (' + v.ay.toFixed(3) + '°, средняя, погрешность до ~1′).</p>' +
+      '<table class="grid"><tr><th>Граха</th><th>Положение</th></tr>' + keys.map(function (k) { return '<tr><td>' + RU[k] + '</td><td>' + sfmt(v.sid[k]) + '</td></tr>'; }).join('') +
+      '<tr><td>Кету (юж. узел)</td><td>' + sfmt(Core.rev(v.sid.node + 180)) + '</td></tr>' + (v.lagna != null ? '<tr><td>Лагна (асцендент)</td><td>' + sfmt(v.lagna) + '</td></tr>' : '') + '</table>' +
+      '<p class="calc">Накшатра Луны: <b>' + v.nak + '</b>, пада ' + v.pada + ' (каждая накшатра — 13°20′), управитель — ' + v.lord + '.' +
+      (hasTime ? '' : ' Без времени рождения накшатра может быть соседней.') + '</p>' +
+      '<h3>Вимшоттари-даши (большие периоды)</h3><p class="calc">Остаток первого периода при рождении: ' + v.balance.toFixed(2) + ' г. (год = 365,25 сут).</p>' +
+      '<table class="grid"><tr><th>Период</th><th>С</th><th>По</th></tr>' + v.periods.map(function (p) { return '<tr><td>' + p.lord + ' (' + p.years + ' л.)</td><td>' + fmtD(p.from) + '</td><td>' + fmtD(p.to) + '</td></tr>'; }).join('') + '</table>' +
+      badge('intr') + '<p>В джйотише главными считаются Луна (её знак — «раши») и лагна; Солнце обычно оказывается на знак «раньше», чем в западной астрологии, из-за разницы зодиаков (~24°). Периоды даш в трактовке окрашены качествами своего управителя.</p></section>');
+    return s.join('');
+  }
+
+  function chineseBlock(J, civil, lonE, hasTime) {
+    var c = Sys.chinese(J, civil, lonE, hasTime), s = [];
+    var an = c.animal, el = Sys.stemEl(c.yearStem), yin = c.yearStem % 2 ? 'инь' : 'ян';
+    s.push('<section class="card cn" id="sec-cn">' + Viz.cnDecor() + '<h2>Китайская традиция</h2><h3>Знак года</h3>' + badge('calc') +
+      '<p class="calc">Китайский Новый год ' + c.cny.y + ': ' + pad(c.cny.d) + '.' + pad(c.cny.m) + ' (новолуние по времени UTC+8). Рождение ' + (c.zodiacYear < civil.y ? '<b>до</b> него — знак предыдущего года' : 'после него') + ': ' + c.zodiacYear + ' г.</p>' +
+      badge('intr') + '<p><b>' + Sys.ANIMALS[an] + '</b>, стихия года <b>' + Sys.ELEM[el] + '</b> (' + yin + '). ' + Sys.ANIMALS[an] + ': ' + Sys.ANIMAL_TXT[an] + '. ' + Sys.ELEM[el] + ': ' + Sys.ELEM_TXT[el] + '.</p>');
+    var lc = Core.jdToDate(c.lichun + 8 / 24);
+    s.push('<h3>Ба-цзы («четыре столпа судьбы»)</h3>' + badge('calc') +
+      '<table class="grid"><tr>' + c.pillars.map(function (p) { return '<th>' + p.t + '</th>'; }).join('') + '</tr><tr>' +
+      c.pillars.map(function (p) { return '<td><div class="hz">' + Sys.STEM_HZ[p.s] + Sys.BR_HZ[p.b] + '</div>' + Sys.STEMS[p.s] + '-' + Sys.BRANCHES[p.b] + '<br><small>' + Sys.ELEM[Sys.stemEl(p.s)] + ' / ' + Sys.ANIMALS[p.b] + '</small></td>'; }).join('') + '</tr></table>' +
+      '<p class="calc">Год Ба-цзы меняется в Личунь (Солнце на 315°): в ' + civil.y + ' г. это ' + pad(lc.d) + '.' + pad(lc.m) + ' (UTC+8), поэтому год столпа — ' + c.baziYear + '. Месяц — по положению Солнца (' + c.sunLon.toFixed(2) + '°, сезонные «цзе»), не по лунному календарю. День — 60-дневный цикл от юлианского дня' +
+      (c.hour ? '; час — по местному среднему солнечному времени (' + pad(Math.floor(c.hour.solarH)) + ':' + pad(Math.floor((c.hour.solarH % 1) * 60)) + '), граница суток — полночь' : (hasTime ? '' : '; без времени рождения столп часа не определяется')) + '.</p>' +
+      '<p class="calc">Баланс пяти стихий (небесные стволы + главная стихия ветвей): ' + Sys.ELEM.map(function (e, i) { return e + ' ' + c.el[i]; }).join(', ') + '.</p>' + Viz.elements(c.el) +
+      badge('intr') + '<p>Господин дня (ствол дня, «я» в карте): <b>' + Sys.STEMS[c.dayMaster] + '</b> — ' + Sys.DM_TXT[c.dayMaster] + '. ' +
+      (Math.min.apply(null, c.el) === 0 ? 'Отсутствующая стихия: ' + Sys.ELEM.filter(function (e, i) { return c.el[i] === 0; }).join(', ') + ' — в трактовке её «восполняют». ' : '') +
+      'Полный разбор Ба-цзы (сила господина дня, полезные стихии, такты удачи) требует школьных правил и здесь не делается.</p></section>');
+    return s.join('');
+  }
+
+  function hdBlock(J, hasTime, offMin) {
+    var h = Sys.humanDesign(J), s = [];
+    function tbl(side) { return side.map(function (x) { return '<tr><td>' + x.body + '</td><td>' + x.gate + '.' + x.line + '</td></tr>'; }).join(''); }
+    s.push('<section class="card hd" id="sec-hd"><div class="scan viz" aria-hidden="true"></div><h2>Дизайн человека (Human Design)</h2>' + badge('calc') + '<div class="viz">' + Viz.bodygraph(h) + '</div>' +
+      '<p class="calc">«Личность» — момент рождения; «Дизайн» — момент, когда Солнце было на 88° раньше: ' + fmtJ(h.designJ, offMin / 60) + ' (местное время). Ворота — 64 сектора по 5,625° начиная с 2° Водолея, линии — по 0,9375°.</p>' +
+      '<div class="two"><table class="grid"><tr><th colspan="2">Личность</th></tr>' + tbl(h.P) + '</table><table class="grid"><tr><th colspan="2">Дизайн</th></tr>' + tbl(h.D) + '</table></div>' +
+      '<p class="calc">Каналы: ' + (h.chans.length ? h.chans.map(function (c) { return c[0] + '–' + c[1]; }).join(', ') : 'нет') + '. Определённые центры: ' + (h.def.length ? h.def.join(', ') : 'нет') + '.</p>' +
+      '<p class="calc">Тип: <b>' + h.type + '</b>; авторитет: <b>' + h.auth + '</b>; профиль: <b>' + h.profile + '</b>; определённость: ' + h.definition + '; ворота креста инкарнации: ' + h.cross[0] + '/' + h.cross[1] + ' | ' + h.cross[2] + '/' + h.cross[3] + '.</p>' +
+      (hasTime ? '' : '<p class="note"><b>Без точного времени</b> ворота Луны (а иногда и тип) недостоверны: Луна проходит одни ворота примерно за 10 часов.</p>') +
+      '<p class="note">Раздел экспериментальный: узлы взяты средние (многие программы берут истинные — ворота узлов могут отличаться), правила типа/авторитета — по открытым описаниям системы. Сверяйте с официальным калькулятором.</p>' +
+      badge('intr') + '<p>' + h.type + ': ' + Sys.HD_TYPE_TXT[h.type] + '. Профиль ' + h.profile + ': «' + Sys.HD_LINE[+h.profile[0]] + ' / ' + Sys.HD_LINE[+h.profile[2]] + '».</p></section>');
+    return s.join('');
+  }
+
+  function scienceBlock() {
+    return '<section class="card sci" id="sec-sci"><h2>О научном статусе</h2><p>Проверяемая часть отчёта — астрономия (положения Солнца, Луны, планет, асцендент) и арифметика (суммы цифр, циклы календаря): её можно пересчитать и сверить. ' +
+      'Связь этих величин с характером и судьбой в контролируемых исследованиях не подтверждена: в двойном слепом опыте Ш. Карлсона (Nature, 1985) астрологи не сопоставили карты с личностными профилями лучше случайного; ' +
+      'общие описания кажутся «про меня» из-за эффекта Форера (Барнума). Для описания личности в психологии используют проверенные опросники (например, модель «Большой пятёрки»). Трактовки здесь — традиционные, для интереса и самонаблюдения, не для решений.</p></section>';
+  }
+
+  // ---------- Тема ----------
+  function applyTheme(t) { if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); $('theme').textContent = t === 'light' ? '☀︎' : t === 'dark' ? '☾' : '◐'; }
+  function initTheme() { var t = 'auto'; try { t = localStorage.getItem('psy-theme') || 'auto'; } catch (e) { } applyTheme(t);
+    $('theme').addEventListener('click', function () { var cur = document.documentElement.getAttribute('data-theme') || 'auto', nx = cur === 'auto' ? 'light' : cur === 'light' ? 'dark' : 'auto'; applyTheme(nx); if (Viz.refreshSky) Viz.refreshSky(); try { localStorage.setItem('psy-theme', nx); } catch (e) { } }); }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    fillCities(); initTheme(); Viz.init();
+    var saved = load(); if (saved) { writeForm(saved); $('remember').checked = true; $('saved').hidden = false; }
+    $('city').addEventListener('change', onCity); $('city').addEventListener('input', onCity);
+    $('go').addEventListener('click', function (e) { e.preventDefault(); compute(); });
+    $('remember').addEventListener('change', function () { if (!this.checked) { forget(); $('saved').hidden = true; } });
+    $('forget').addEventListener('click', function (e) { e.preventDefault(); forget(); $('remember').checked = false; $('saved').hidden = true; });
+  });
+  // ---------- Копировать / Поделиться ----------
+  var SKIP = '.viz, svg, .num-hero, .wheel-wrap, .cn-deco, .legend, .five, .body, .acts, .scan, .open, .orn, .m-wrap';
+  function panelText(panel) {
+    var parts = ['Карта по дате рождения'];
+    Array.prototype.forEach.call(panel.querySelectorAll('section.card'), function (sec) {
+      Array.prototype.forEach.call(sec.children, function (ch) {
+        if (ch.matches(SKIP)) return;
+        var t = (ch.innerText || '').trim(); if (t) parts.push(t);
+      });
+      parts.push('');
+    });
+    parts.push('Разработано: Калачев М.В.');
+    return parts.join('\n').replace(/\n{3,}/g, '\n\n');
+  }
+  function toast(msg) {
+    var t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('on');
+    clearTimeout(toast.h); toast.h = setTimeout(function () { t.classList.remove('on'); }, 1800);
+  }
+  function copyText(txt) {
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.top = '-1000px';
+      document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, txt.length);
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e) { }
+      document.body.removeChild(ta); toast(ok ? 'Отчёт скопирован' : 'Не удалось скопировать');
+    }
+    try {
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(function () { toast('Отчёт скопирован'); }, fallback);
+      else fallback();
+    } catch (e) { fallback(); }
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.act'); if (!b) return;
+    var panel = b.closest('.panel'); if (!panel) return;
+    if (b.getAttribute('data-act') === 'pdf') { printPanel(panel.id === 'p-sum' ? 'all' : panel.id.slice(2)); return; }
+    var txt = panelText(panel);
+    if (b.getAttribute('data-act') === 'share' && navigator.share) {
+      navigator.share({ title: 'Карта по дате рождения', text: txt }).catch(function () { });
+    } else copyText(txt);
+  });
+  // ---------- PDF через печать ----------
+  function preparePrint(id) {
+    document.documentElement.setAttribute('data-print', id);
+    Array.prototype.forEach.call(document.querySelectorAll('.glow-num'), function (n) { n.textContent = n.getAttribute('data-count'); });
+    var d = new Date(); document.title = 'Карта по дате рождения — ' + (id === 'all' ? 'полный отчёт' : ({ num: 'нумерология', west: 'астрология', ved: 'джйотиш', cn: 'ба-цзы', hd: 'human design' })[id] || id);
+  }
+  function endPrint() { document.documentElement.removeAttribute('data-print'); document.title = 'Карта по дате рождения'; }
+  window.addEventListener('afterprint', endPrint);
+  function printPanel(id) { preparePrint(id); setTimeout(function () { window.print(); }, 50); }
+  window.PsyUI = { preparePrint: preparePrint, endPrint: endPrint, compute: compute, localToUTC: localToUTC };
+})();
+
+</script>
+</body>
+</html>
