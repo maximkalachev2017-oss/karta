@@ -33,11 +33,18 @@ h3{font-size:16px;margin:16px 0 4px}
 #theme{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;width:40px;height:40px;font-size:18px;flex:none}
 .card{scroll-margin-top:62px;position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;overflow:hidden}
 label{display:block;font-size:14px;color:var(--mute);margin:10px 0 4px}
-input,select{width:100%;font-size:16px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--inbg);color:var(--ink);min-height:44px}
+input,select{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;height:46px;font-size:16px;line-height:1.2;padding:10px;border:1px solid var(--line);border-radius:10px;background-color:var(--inbg);color:var(--ink);-webkit-appearance:none;appearance:none;margin:0}
+input::placeholder{color:var(--mute);opacity:.75}
+select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23999' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.dgrid{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:8px}
+.tgrid{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;max-width:220px}
+.dgrid input,.tgrid input{text-align:center;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.tgrid .sep{font-size:20px;color:var(--mute)}
+.row>div,.row3>div{min-width:0}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:15px;margin-top:12px}
-.chk input{width:22px;min-height:22px;height:22px}
+.chk input{width:22px;min-width:22px;height:22px;padding:0;-webkit-appearance:checkbox;appearance:auto;display:inline-block}
 button.go{width:100%;margin-top:14px;font-size:17px;font-weight:600;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#b8892a,#e6c06a 50%,#b8892a);color:#1a1405;box-shadow:0 6px 18px rgba(184,137,42,.35);transition:transform .15s}
 button.go:active{transform:scale(.98)}
 .hint,.note{font-size:13px;color:var(--mute)}
@@ -308,12 +315,23 @@ svg text{font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2","No
 <div class="wrap">
 <header><h1>Карта <span>по дате рождения</span></h1><button id="theme" type="button" aria-label="Тема">◐</button></header>
 <form id="form" class="card" autocomplete="off" onsubmit="return false">
-  <label for="date">Дата рождения *</label>
-  <input id="date" type="date" required min="1800-01-01" max="2100-12-31">
-  <div class="row">
-    <div><label for="time">Время (если известно)</label><input id="time" type="time"></div>
-    <div><label for="hs">Система домов</label><select id="hs"><option value="placidus">Плацидус</option><option value="equal">Равнодомная</option><option value="whole">Целые знаки</option></select></div>
+  <label for="dd">Дата рождения *</label>
+  <div class="dgrid">
+    <input id="dd" class="num2" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="ДД" aria-label="День">
+    <input id="dm" class="num2" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="ММ" aria-label="Месяц">
+    <input id="dy" class="num4" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="ГГГГ" aria-label="Год">
   </div>
+  <input id="date" type="hidden">
+  <label for="th">Время рождения (если известно)</label>
+  <div class="tgrid">
+    <input id="th" class="num2" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="ЧЧ" aria-label="Часы">
+    <span class="sep">:</span>
+    <input id="tm" class="num2" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="ММ" aria-label="Минуты">
+  </div>
+  <input id="time" type="hidden">
+  <p id="dterr" class="err small" hidden></p>
+  <label for="hs">Система домов</label>
+  <select id="hs"><option value="placidus">Плацидус</option><option value="equal">Равнодомная</option><option value="whole">Целые знаки</option></select>
   <label for="city">Город рождения (выбор из списка или ввод координат)</label>
   <input id="city" list="cities" placeholder="Начните вводить: Москва…">
   <datalist id="cities"></datalist>
@@ -1127,9 +1145,30 @@ var Viz = (function () {
     return { date: $('date').value, time: $('time').value, name: $('name').value, city: $('city').value, lat: $('lat').value, lon: $('lon').value,
       zone: $('zone').value, tzman: $('tzman').value, hs: $('hs').value };
   }
-  function writeForm(d) { ['date', 'time', 'name', 'city', 'lat', 'lon', 'zone', 'tzman', 'hs'].forEach(function (k) { if (d[k] != null) $(k).value = d[k]; }); }
+  function writeForm(d) { ['date', 'time', 'name', 'city', 'lat', 'lon', 'zone', 'tzman', 'hs'].forEach(function (k) { if (d[k] != null) $(k).value = d[k]; }); fillDT(); }
 
+  // Дата и время вводятся числами (надёжно в iOS Safari); в скрытые поля пишется ГГГГ-ММ-ДД и ЧЧ:ММ
+  function p2(n) { return (n < 10 ? '0' : '') + n; }
+  function syncDT() {
+    var d = parseInt($('dd').value, 10), m = parseInt($('dm').value, 10), y = parseInt($('dy').value, 10), msg = '';
+    var ok = d >= 1 && m >= 1 && m <= 12 && y >= 1800 && y <= 2100;
+    if (ok) { var t = new Date(Date.UTC(y, m - 1, d)); ok = t.getUTCDate() === d && t.getUTCMonth() === m - 1; }
+    $('date').value = ok ? y + '-' + p2(m) + '-' + p2(d) : '';
+    if (!ok && ($('dd').value || $('dm').value || $('dy').value)) msg = 'Проверьте дату: день, месяц и год (1800–2100).';
+    var hv = $('th').value.trim(), mv = $('tm').value.trim(), h = parseInt(hv, 10), mi = mv === '' ? 0 : parseInt(mv, 10);
+    if (hv === '' && mv === '') $('time').value = '';
+    else if (h >= 0 && h <= 23 && mi >= 0 && mi <= 59) $('time').value = p2(h) + ':' + p2(mi);
+    else { $('time').value = ''; msg += (msg ? ' ' : '') + 'Проверьте время: часы 0–23, минуты 0–59.'; }
+    $('dterr').textContent = msg; $('dterr').hidden = !msg;
+    return !msg;
+  }
+  function fillDT() {
+    var dv = $('date').value, tv = $('time').value;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dv)) { $('dy').value = dv.slice(0, 4); $('dm').value = dv.slice(5, 7); $('dd').value = dv.slice(8, 10); }
+    if (/^\d{2}:\d{2}/.test(tv)) { $('th').value = tv.slice(0, 2); $('tm').value = tv.slice(3, 5); }
+  }
   function compute() {
+    if (!syncDT()) { $('out').innerHTML = ''; return; }
     var f = readForm(), err = [];
     if (!/^\d{4}-\d{2}-\d{2}$/.test(f.date)) { $('out').innerHTML = '<p class="err">Укажите дату рождения.</p>'; return; }
     var Y = +f.date.slice(0, 4), M = +f.date.slice(5, 7), Dd = +f.date.slice(8, 10);
@@ -1353,6 +1392,13 @@ var Viz = (function () {
     var saved = load(); if (saved) { writeForm(saved); $('remember').checked = true; $('saved').hidden = false; }
     $('city').addEventListener('change', onCity); $('city').addEventListener('input', onCity);
     $('go').addEventListener('click', function (e) { e.preventDefault(); compute(); });
+    // только цифры и автопереход к следующему полю
+    [['dd', 'dm', 2], ['dm', 'dy', 2], ['dy', 'th', 4], ['th', 'tm', 2], ['tm', 'city', 2]].forEach(function (x) {
+      $(x[0]).addEventListener('input', function () {
+        var v = this.value.replace(/\D/g, '').slice(0, x[2]); if (v !== this.value) this.value = v;
+        if (v.length === x[2] && document.activeElement === this) $(x[1]).focus();
+      });
+    });
     $('remember').addEventListener('change', function () { if (!this.checked) { forget(); $('saved').hidden = true; } });
     $('forget').addEventListener('click', function (e) { e.preventDefault(); forget(); $('remember').checked = false; $('saved').hidden = true; });
   });
