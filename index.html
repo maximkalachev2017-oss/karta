@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; connect-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: blob:; manifest-src 'self'; connect-src https://cdn.jsdelivr.net; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>Карта по дате рождения</title>
 <meta name="description" content="Офлайн-расчёт: нумерология, натальная карта, джйотиш, Ба-цзы, Дизайн человека. Данные никуда не отправляются.">
@@ -319,6 +319,20 @@ details.ex.src,details.ex.how{background:transparent;border:1px solid var(--line
 details.ex.src ol{font-size:13px}
 .ex .grid{font-size:13px}
 .card.disc .ex-sh{color:var(--acc);font-weight:700;margin:10px 0 2px}.card.disc p{font-size:14px;margin:4px 0}
+/* ---------- PDF-файл: индикатор и окно готовности ---------- */
+#pdfov{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:rgba(6,7,16,.9);color:#f3e6c4;font:600 16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;text-align:center}
+#pdfov .box{width:100%;max-width:330px;background:#151830;border:1px solid rgba(230,192,106,.4);border-radius:16px;padding:20px 16px}
+#pdfov .sp{width:34px;height:34px;margin:0 auto 12px;border:3px solid rgba(230,192,106,.25);border-top-color:#e6c06a;border-radius:50%;animation:spin 1s linear infinite}
+#pdfov .pr{font-size:13px;font-weight:400;color:#c9c1a8;margin-top:6px;word-break:break-word}
+#pdfov .bt{display:block;width:100%;min-height:46px;margin-top:10px;border-radius:12px;border:1px solid #e6c06a;background:transparent;color:#e6c06a;font:600 16px/1.2 inherit;font-family:inherit}
+#pdfov .bt.pri{border:0;background:linear-gradient(135deg,#b8892a,#e6c06a 50%,#b8892a);color:#1a1405}
+#pdfov .bt.ghost{border-color:rgba(255,255,255,.2);color:#c9c1a8}
+:root[data-pdfgen] *,:root[data-pdfgen] *:before,:root[data-pdfgen] *:after{animation:none!important;transition:none!important}
+:root[data-pdfgen] #pdfov .sp{animation:spin 1s linear infinite!important}
+:root[data-pdfgen] .wrap{width:760px;max-width:none}
+:root[data-pdfgen] .panel{display:none!important}
+:root[data-pdfgen] .panel.pdf-on{display:block!important}
+@media print{#pdfov{display:none!important}}
 </style>
 </head>
 <body>
@@ -365,7 +379,7 @@ details.ex.src ol{font-size:13px}
   <label class="chk"><input id="remember" type="checkbox"> Запомнить на этом устройстве</label>
   <p id="saved" class="hint" hidden>Данные сохранены только в этом браузере. <button id="forget" class="lnk" type="button">Удалить</button></p>
   <button id="go" class="go" type="button">Рассчитать</button>
-  <p class="hint">Все расчёты выполняются на устройстве. Страница не обращается к сети.</p>
+  <p class="hint">Все расчёты выполняются на устройстве, данные никуда не отправляются. Только для кнопки PDF страница один раз загружает модули и шрифт из открытой библиотеки (cdn.jsdelivr.net), без ваших данных.</p>
 </form>
 <div id="out"></div>
 </div>
@@ -1587,7 +1601,7 @@ var Viz = (function () {
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.act'); if (!b) return;
     var panel = b.closest('.panel'); if (!panel) return;
-    if (b.getAttribute('data-act') === 'pdf') { printPanel(panel.id === 'p-sum' ? 'all' : panel.id.slice(2)); return; }
+    if (b.getAttribute('data-act') === 'pdf') { makePdf(panel.id === 'p-sum' ? 'all' : panel.id.slice(2)); return; }
     var txt = panelText(panel);
     if (b.getAttribute('data-act') === 'share' && navigator.share) {
       navigator.share({ title: 'Карта по дате рождения', text: txt }).catch(function () { });
@@ -1602,7 +1616,378 @@ var Viz = (function () {
   function endPrint() { document.documentElement.removeAttribute('data-print'); document.title = 'Карта по дате рождения'; }
   window.addEventListener('afterprint', endPrint);
   function printPanel(id) { preparePrint(id); setTimeout(function () { window.print(); }, 50); }
-  window.PsyUI = { preparePrint: preparePrint, endPrint: endPrint, compute: compute, localToUTC: localToUTC };
+  // ---------- PDF-файл прямо на устройстве ----------
+  // Модули грузятся только по нажатию «PDF» с cdn.jsdelivr.net (фиксированные версии, проверка целостности SRI).
+  // Текст — векторный (шрифт DejaVu Sans: кириллица, знаки зодиака и планет), схемы и иероглифы — картинками.
+  // Если модули не загрузились или что-то пошло не так — запасной путь: печать, как раньше.
+  var PDFLIB = {
+    pdfmake: ['https://cdn.jsdelivr.net/npm/pdfmake@0.2.20/build/pdfmake.min.js', 'sha384-G23ofMOEI98f9UnroUBjDi6Ll55Y5E6bOX4VAMJo0nIbuQRIxzn0g4athUOb58zs'],
+    h2c: ['https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', 'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H'],
+    pdflib: ['https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js', 'sha384-weMABwrltA6jWR8DDe9Jp5blk+tZQh7ugpCsF3JwSA53WZM9/14PjS5LAJNHNjAI'],
+    font: ['https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans.ttf', 'sha384-WWCI8RVJmiZvis8EpwnSyGn7cTtzGfshxkxsg5ZuL9AUFpzKg99zhn/2lkFh2+vG'],
+    fontB: ['https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans-Bold.ttf', 'sha384-NaVuSXCZeye4QyXzNedGU5Jz3B9xbAydt90g8TJAfHeosmQCXUNytQnYH5ZzJgKv']
+  };
+  var PDFNAME = { all: 'полный отчёт', sum: 'сводка', num: 'нумерология', west: 'астрология', ved: 'джйотиш', cn: 'ба-цзы', hd: 'Human Design' };
+  var PDFTITLE = { sum: 'Сводка', num: 'Нумерология', west: 'Западная астрология', ved: 'Джйотиш', cn: 'Ба-цзы', hd: 'Human Design', disc: 'Пояснение' };
+  // Тема страницы PDF для каждой системы — те же цвета, что у вкладки
+  var PTHEME = {
+    sum: { bg: '#0b0d1a', top: '#262b52', acc: '#e6c06a' },
+    num: { bg: '#120c26', top: '#3d2575', acc: '#f1cf7a', mid: '#1a1135' },
+    west: { bg: '#04060f', top: '#1c1d4a', acc: '#9fc2ff', stars: true },
+    ved: { bg: '#2a0d04', top: '#8a3c10', acc: '#ffb347', mid: '#4a1a07' },
+    cn: { bg: '#4a0b0a', top: '#a32a1c', acc: '#f3d58a', mid: '#6e130f' },
+    hd: { bg: '#081619', top: '#14403f', acc: '#7fe3d4', mid: '#0d2328', grid: true }
+  };
+  PTHEME.disc = PTHEME.sum;
+  var PK = 0.735, PW = 595.28, PH = 841.89, PMX = 40, PMT = 42, PMB = 40;
+  var CJK = /[⺀-鿿豈-﫿　-〿＀-￯]/;
+  var P_SKIP = '.acts,.open,.cn-deco,.scan,.flow,#tabs,script,style,template';
+  var P_FIG = 'svg,canvas,img,.num-hero,table.pyth,.sic,.legend';
+  var pLoaded = {}, pBusy = false;
+
+  function pScript(k) {
+    if (window.pdfMake && k === 'pdfmake') return Promise.resolve();
+    if (window.html2canvas && k === 'h2c') return Promise.resolve();
+    if (window.PDFLib && k === 'pdflib') return Promise.resolve();
+    if (pLoaded[k]) return pLoaded[k];
+    return (pLoaded[k] = new Promise(function (res, rej) {
+      var s = document.createElement('script'); s.src = PDFLIB[k][0]; s.integrity = PDFLIB[k][1]; s.crossOrigin = 'anonymous';
+      s.onload = function () { res(); }; s.onerror = function () { pLoaded[k] = null; s.remove(); rej(new Error('Не загрузился модуль ' + k)); };
+      document.head.appendChild(s);
+    }));
+  }
+  function pFont(k) {
+    if (pLoaded[k]) return pLoaded[k];
+    return (pLoaded[k] = fetch(PDFLIB[k][0], { mode: 'cors', integrity: PDFLIB[k][1] })
+      .then(function (r) { if (!r.ok) throw new Error('Не загрузился шрифт'); return r.arrayBuffer(); })
+      .then(function (buf) { var u = new Uint8Array(buf), s = '', CH = 0x8000; for (var i = 0; i < u.length; i += CH) s += String.fromCharCode.apply(null, u.subarray(i, i + CH)); return btoa(s); })
+      .catch(function (e) { pLoaded[k] = null; throw e; }));
+  }
+  function pTimeout(p, ms) { return Promise.race([p, new Promise(function (_, rej) { setTimeout(function () { rej(new Error('Нет связи с библиотекой')); }, ms); })]); }
+  function pWait(ms) { return new Promise(function (r) { setTimeout(r, ms || 0); }); }
+
+  // ---------- цвета ----------
+  function pRgb(c) {
+    if (!c) return null; c = String(c).trim();
+    if (c[0] === '#') { var h = c.slice(1); if (h.length === 3) h = h.replace(/./g, '$&$&'); return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16), a: 1 }; }
+    var m = /rgba?\(([^)]+)\)/.exec(c); if (!m) return null;
+    var p = m[1].split(/[\s,\/]+/).filter(Boolean).map(function (x) { return /%$/.test(x) ? parseFloat(x) / 100 : parseFloat(x); });
+    return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+  }
+  function pHex(o) { function h(v) { v = Math.max(0, Math.min(255, Math.round(v))); return (v < 16 ? '0' : '') + v.toString(16); } return '#' + h(o.r) + h(o.g) + h(o.b); }
+  function pBlend(c, base) { // цвет с прозрачностью → сплошной поверх base; null, если прозрачный
+    var o = pRgb(c); if (!o || o.a < 0.02) return null; var b = pRgb(base) || { r: 0, g: 0, b: 0 };
+    return pHex({ r: o.r * o.a + b.r * (1 - o.a), g: o.g * o.a + b.g * (1 - o.a), b: o.b * o.a + b.b * (1 - o.a) });
+  }
+  function pPx(v) { return (parseFloat(v) || 0) * PK; }
+
+  // ---------- разбор страницы в документ pdfmake ----------
+  function pKids(el) { return Array.prototype.filter.call(el.children, function (c) { return !c.matches(P_SKIP) && getComputedStyle(c).display !== 'none'; }); }
+  function pHasBlock(el) { return Array.prototype.some.call(el.children, function (c) { if (c.matches(P_SKIP)) return false; var d = getComputedStyle(c).display; return d !== 'none' && d.indexOf('inline') !== 0 && c.tagName !== 'BR'; }); }
+  function pRuns(nodes, ctx, acc) {
+    nodes.forEach(function (n) {
+      if (n.nodeType === 3) {
+        var t = n.nodeValue.replace(/[︎️​]/g, '').replace(/\s+/g, ' '); if (!t) return;
+        var cs = getComputedStyle(n.parentNode), r = { text: t, color: pBlend(cs.color, ctx.bg) || '#ffffff', fontSize: pPx(cs.fontSize) };
+        var w = cs.fontWeight; if (w === 'bold' || +w >= 600) r.bold = true;
+        if (cs.display === 'inline-block') { var bg = pBlend(cs.backgroundColor, ctx.bg); if (bg) { r.background = bg; r.text = ' ' + r.text.trim() + ' '; } }
+        acc.push(r); return;
+      }
+      if (n.nodeType !== 1 || n.matches(P_SKIP)) return;
+      if (n.tagName === 'BR') { acc.push({ text: '\n' }); return; }
+      if (getComputedStyle(n).display === 'none') return;
+      pRuns(Array.prototype.slice.call(n.childNodes), ctx, acc);
+    });
+    return acc;
+  }
+  function pTrim(r) {
+    for (var i = 0; i < r.length; i++) { // пробелы у переносов строк и по краям
+      if (r[i].text === '\n') { if (i > 0 && r[i - 1].text) r[i - 1].text = r[i - 1].text.replace(/ +$/, ''); if (r[i + 1] && r[i + 1].text) r[i + 1].text = r[i + 1].text.replace(/^ +/, ''); }
+    }
+    if (r.length) { r[0].text = r[0].text.replace(/^ +/, ''); r[r.length - 1].text = r[r.length - 1].text.replace(/ +$/, ''); }
+    return r.filter(function (x) { return x.text !== '' || x.background; });
+  }
+  function pText(nodes, el, ctx) {
+    var r = pTrim(pRuns(nodes, ctx, [])); if (!r.length || !r.some(function (x) { return /\S/.test(x.text); })) return null;
+    var cs = getComputedStyle(el), fs = parseFloat(cs.fontSize) || 16, lh = parseFloat(cs.lineHeight); lh = isNaN(lh) ? 1.2 : lh / fs;
+    var al = cs.textAlign; al = al === 'center' ? 'center' : al === 'right' || al === 'end' ? 'right' : al === 'justify' ? 'justify' : 'left';
+    return { text: r, fontSize: pPx(cs.fontSize), lineHeight: Math.max(1, lh * 0.82), alignment: al, color: pBlend(cs.color, ctx.bg) || '#ffffff' };
+  }
+  function pFig(el, ctx, jobs) {
+    var r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null;
+    var w = Math.min(r.width * PK, ctx.w), n = { image: 'pending', width: w, alignment: el.matches('.sic') ? 'left' : 'center' };
+    jobs.push({ el: el, node: n, w: r.width, h: r.height }); return n;
+  }
+  function pMargin(n, cs) { if (!n) return n; var t = pPx(cs.marginTop) * 0.7, b = pPx(cs.marginBottom) * 0.7; n.margin = [0, Math.min(t, 12), 0, Math.max(Math.min(b, 12), 2)]; return n; }
+  function pBox(el, cs, ctx, build) {
+    var fill = pBlend(cs.backgroundColor, ctx.bg), bl = parseFloat(cs.borderLeftWidth) || 0, br = parseFloat(cs.borderRightWidth) || 0, bt = parseFloat(cs.borderTopWidth) || 0, bb = parseFloat(cs.borderBottomWidth) || 0;
+    if (cs.borderLeftStyle === 'none') bl = 0; if (cs.borderRightStyle === 'none') br = 0; if (cs.borderTopStyle === 'none') bt = 0; if (cs.borderBottomStyle === 'none') bb = 0;
+    var pad = [cs.paddingLeft, cs.paddingTop, cs.paddingRight, cs.paddingBottom].map(pPx);
+    if (!fill && !bl && !br && !bt && !bb) return build({ bg: ctx.bg, w: ctx.w - pad[0] - pad[2] }, pad);
+    var inner = build({ bg: fill || ctx.bg, w: ctx.w - pad[0] - pad[2] - (bl + br) * PK }, null);
+    if (!inner || !inner.length) return null;
+    var lc = pBlend(cs.borderLeftColor, ctx.bg) || '#888888', rc = pBlend(cs.borderRightColor, ctx.bg) || lc, tc = pBlend(cs.borderTopColor, ctx.bg) || lc, bc = pBlend(cs.borderBottomColor, ctx.bg) || tc;
+    var auto = cs.display === 'inline-block';
+    return [{
+      table: { widths: [auto ? 'auto' : '*'], body: [[{ stack: inner, fillColor: fill || undefined }]] },
+      layout: {
+        hLineWidth: function (i) { return (i === 0 ? bt : bb) * PK; }, vLineWidth: function (i) { return (i === 0 ? bl : br) * PK; },
+        hLineColor: function (i) { return i === 0 ? tc : bc; }, vLineColor: function (i) { return i === 0 ? lc : rc; },
+        paddingLeft: function () { return Math.max(pad[0], 3); }, paddingRight: function () { return Math.max(pad[2], 3); },
+        paddingTop: function () { return Math.max(pad[1], 1.5); }, paddingBottom: function () { return Math.max(pad[3], 1.5); }
+      }
+    }];
+  }
+  function pTable(el, cs, ctx, jobs) {
+    var rows = Array.prototype.filter.call(el.rows, function (r) { return getComputedStyle(r).display !== 'none'; });
+    if (!rows.length) return null;
+    var grid = [], ncol = 0, widths = [];
+    rows.forEach(function (tr, ri) {
+      grid[ri] = grid[ri] || []; var c = 0;
+      Array.prototype.forEach.call(tr.cells, function (td) {
+        while (grid[ri][c]) c++;
+        var cs2 = getComputedStyle(td), cs2bg = pBlend(cs2.backgroundColor, ctx.bg), cell;
+        var cw = Math.max(20, ctx.w * 0.9);
+        if (pHasBlock(td)) { var st = pWalk(td, { bg: cs2bg || ctx.bg, w: cw }, jobs, []); cell = { stack: st.length ? st : [{ text: ' ' }] }; }
+        else { cell = pText(Array.prototype.slice.call(td.childNodes), td, { bg: cs2bg || ctx.bg }) || { text: ' ' }; }
+        if (td.tagName === 'TH') cell.bold = true;
+        if (cs2bg) cell.fillColor = cs2bg;
+        var al = cs2.textAlign; cell.alignment = al === 'center' ? 'center' : al === 'right' ? 'right' : 'left';
+        var cspan = td.colSpan || 1, rspan = td.rowSpan || 1;
+        if (cspan > 1) cell.colSpan = cspan; if (rspan > 1) cell.rowSpan = rspan;
+        if (cspan === 1) { var bw = td.getBoundingClientRect().width; if (!widths[c] || widths[c] < bw) widths[c] = bw; }
+        for (var y = 0; y < rspan; y++) { grid[ri + y] = grid[ri + y] || []; for (var x = 0; x < cspan; x++) grid[ri + y][c + x] = (x || y) ? {} : cell; }
+        c += cspan; if (c > ncol) ncol = c;
+      });
+    });
+    var body = grid.map(function (row) { var a = []; for (var i = 0; i < ncol; i++) a.push(row[i] || { text: '' }); return a; });
+    var td0 = el.querySelector('td,th'), tcs = td0 ? getComputedStyle(td0) : cs;
+    var bw = parseFloat(tcs.borderTopWidth) || 0; if (tcs.borderTopStyle === 'none') bw = 0;
+    var lw = bw ? 0.5 : 0, lcol = pBlend(tcs.borderTopColor, ctx.bg) || '#555555';
+    var pl = Math.max(pPx(tcs.paddingLeft), 2), pr = Math.max(pPx(tcs.paddingRight), 2), pt = Math.max(pPx(tcs.paddingTop), 1), pb = Math.max(pPx(tcs.paddingBottom), 1);
+    var tw = 0; for (var i = 0; i < ncol; i++) { widths[i] = widths[i] || 40; tw += widths[i]; }
+    var avail = Math.min(ctx.w, el.getBoundingClientRect().width * PK) - ncol * (pl + pr + lw) - lw;
+    var ws = widths.map(function (w) { return Math.max(8, w / tw * avail); });
+    return {
+      table: { widths: ws, body: body, dontBreakRows: true, headerRows: rows[0].querySelector('th') && rows.length > 2 && !rows[0].querySelector('td') ? 1 : 0 },
+      layout: { hLineWidth: function () { return lw; }, vLineWidth: function () { return lw; }, hLineColor: function () { return lcol; }, vLineColor: function () { return lcol; },
+        paddingLeft: function () { return pl; }, paddingRight: function () { return pr; }, paddingTop: function () { return pt; }, paddingBottom: function () { return pb; } }
+    };
+  }
+  function pList(el, cs, ctx, jobs) {
+    var items = Array.prototype.filter.call(el.children, function (li) { return li.tagName === 'LI' && getComputedStyle(li).display !== 'none'; }).map(function (li) {
+      if (pHasBlock(li)) { var st = pWalk(li, { bg: ctx.bg, w: ctx.w - 14 }, jobs, []); return { stack: st }; }
+      return pText(Array.prototype.slice.call(li.childNodes), li, ctx) || { text: '' };
+    });
+    if (!items.length) return null;
+    var n = {}; n[el.tagName === 'OL' ? 'ol' : 'ul'] = items; n.markerColor = pBlend(cs.color, ctx.bg) || '#ffffff'; n.fontSize = pPx(cs.fontSize);
+    return n;
+  }
+  function pCols(el, kids, cs, ctx, jobs) {
+    var rs = kids.map(function (k) { return k.getBoundingClientRect(); });
+    var maxW = Math.max.apply(null, rs.map(function (r) { return r.width; })), minW = Math.min.apply(null, rs.map(function (r) { return r.width; }));
+    var gap = pPx(cs.columnGap) || pPx(cs.gap) || 6, wide = rs.map(function (r) { return r.width; }).indexOf(maxW), even = minW > maxW * 0.9;
+    var fixed = 0; rs.forEach(function (r, i) { if (!even && i !== wide) fixed += r.width * PK; });
+    var cols = kids.map(function (k, i) {
+      var cw = even ? (ctx.w - gap * (kids.length - 1)) / kids.length : (i === wide ? ctx.w - fixed - gap * (kids.length - 1) : rs[i].width * PK);
+      var st = pNode(k, getComputedStyle(k), { bg: ctx.bg, w: cw }, jobs);
+      return { stack: st ? (Array.isArray(st) ? st : [st]) : [{ text: '' }], width: even || i === wide ? '*' : cw };
+    });
+    return { columns: cols, columnGap: gap };
+  }
+  function pNode(el, cs, ctx, jobs) {
+    if (el.matches(P_FIG)) return pFig(el, ctx, jobs);
+    if (el.tagName === 'TABLE') { if (CJK.test(el.textContent)) return pFig(el, ctx, jobs); return pMargin(pTable(el, cs, ctx, jobs), cs); }
+    if (CJK.test(el.textContent) && !pHasBlock(el)) return pFig(el, ctx, jobs);
+    if (el.tagName === 'UL' || el.tagName === 'OL') return pMargin(pList(el, cs, ctx, jobs), cs);
+    var kids = pKids(el);
+    if ((cs.display === 'flex' || cs.display === 'grid') && kids.length > 1 && cs.flexDirection.indexOf('column') < 0) {
+      var top = kids[0].getBoundingClientRect().top;
+      if (kids.every(function (k) { return Math.abs(k.getBoundingClientRect().top - top) < 4; })) return pMargin(pCols(el, kids, cs, ctx, jobs), cs);
+    }
+    var sec = el.matches('section.card,.panel');
+    var res = sec ? pWalk(el, ctx, jobs, []) : pBox(el, cs, ctx, function (c) { return pWalk(el, c, jobs, []); });
+    if (!res || !res.length) return null;
+    var head = el.matches('h1,h2,h3,h4,summary,.ex-sh,.ex-h');
+    if (head && res.length === 1) { res[0].headlineLevel = 1; if (el.tagName === 'SUMMARY') res[0].text = [{ text: '▸ ', color: res[0].color }].concat(res[0].text); }
+    if (el.tagName === 'H2' && el.parentNode.matches('section.card')) {
+      res.push({ canvas: [{ type: 'line', x1: 0, y1: 0, x2: ctx.w, y2: 0, lineWidth: 0.6, lineColor: ctx.acc || res[0].color }], margin: [0, 1, 0, 6] });
+      res[0].headlineLevel = 1;
+    }
+    if (sec) return res;
+    var n = res.length === 1 ? res[0] : { stack: res };
+    return pMargin(n, cs);
+  }
+  function pWalk(el, ctx, jobs, out) {
+    var inl = [];
+    function flush() { if (!inl.length) return; var t = pText(inl, el, ctx); inl = []; if (t) out.push(t); }
+    Array.prototype.forEach.call(el.childNodes, function (n) {
+      if (n.nodeType === 3) { if (/\S/.test(n.nodeValue) || inl.length) inl.push(n); return; }
+      if (n.nodeType !== 1 || n.matches(P_SKIP)) return;
+      var cs = getComputedStyle(n); if (cs.display === 'none') return;
+      if ((cs.display.indexOf('inline') === 0 || n.tagName === 'BR') && !n.matches(P_FIG) && !n.matches('.bdg,.need')) { inl.push(n); return; }
+      flush(); var x = pNode(n, cs, ctx, jobs);
+      if (x) { if (Array.isArray(x)) out.push.apply(out, x); else out.push(x); }
+    });
+    flush(); return out;
+  }
+
+  // ---------- картинки: схемы SVG и блоки с иероглифами ----------
+  var SVGP = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin', 'opacity', 'font-size', 'font-family', 'font-weight', 'text-anchor', 'dominant-baseline', 'visibility'];
+  function pInlineSvg(root, saved) { // стили из CSS переносим в атрибут style, чтобы их видела отрисовка в картинку
+    Array.prototype.forEach.call(root.querySelectorAll('svg, svg *'), function (n) {
+      if (saved) saved.push([n, n.getAttribute('style')]);
+      var cs = getComputedStyle(n), st = ''; SVGP.forEach(function (p) { var v = cs.getPropertyValue(p); if (v) st += p + ':' + v + ';'; });
+      if (cs.display === 'none') st += 'display:none;';
+      n.setAttribute('style', st);
+    });
+  }
+  function pSvgImg(svg, w, h, sc) {
+    var c = svg.cloneNode(true); c.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); c.setAttribute('width', w); c.setAttribute('height', h);
+    var src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(c));
+    return new Promise(function (res, rej) {
+      var img = new Image();
+      img.onload = function () {
+        var cv = document.createElement('canvas'); cv.width = Math.round(w * sc); cv.height = Math.round(h * sc);
+        try { cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); res(cv.toDataURL('image/png')); } catch (e) { rej(e); }
+        cv.width = cv.height = 0;
+      };
+      img.onerror = function () { rej(new Error('svg')); }; img.src = src;
+    });
+  }
+  function pRaster(job) {
+    var sc = Math.min(2.5, Math.sqrt(4e6 / Math.max(1, job.w * job.h))); // запас по лимиту холста iOS
+    if (job.el.tagName.toLowerCase() === 'svg') return pSvgImg(job.el, job.w, job.h, sc);
+    return window.html2canvas(job.el, { backgroundColor: null, scale: sc, logging: false, useCORS: false, windowWidth: 800, removeContainer: true })
+      .then(function (cv) { var u = cv.toDataURL('image/png'); cv.width = cv.height = 0; return u; });
+  }
+
+  // ---------- оформление страниц ----------
+  function pBgSvg(th) {
+    var s = '<svg xmlns="http://www.w3.org/2000/svg" width="' + PW + '" height="' + PH + '" viewBox="0 0 ' + PW + ' ' + PH + '">' +
+      '<defs><radialGradient id="g" gradientUnits="userSpaceOnUse" cx="' + PW / 2 + '" cy="0" r="' + PH * 0.62 + '">' +
+      '<stop offset="0" stop-color="' + th.top + '"/>' + (th.mid ? '<stop offset="0.55" stop-color="' + th.mid + '"/>' : '') + '<stop offset="1" stop-color="' + th.bg + '"/></radialGradient></defs>' +
+      '<rect width="' + PW + '" height="' + PH + '" fill="' + th.bg + '"/><rect width="' + PW + '" height="' + PH + '" fill="url(#g)"/>';
+    if (th.stars) { var x = 7; for (var i = 0; i < 70; i++) { x = (x * 9301 + 49297) % 233280; var a = x / 233280; x = (x * 9301 + 49297) % 233280; var b = x / 233280; x = (x * 9301 + 49297) % 233280; s += '<circle cx="' + (a * PW).toFixed(1) + '" cy="' + (b * PH).toFixed(1) + '" r="' + (0.4 + (x / 233280) * 0.9).toFixed(2) + '" fill="#dfe8ff" fill-opacity="' + (0.35 + b * 0.4).toFixed(2) + '"/>'; } }
+    if (th.grid) { for (var gx = 0; gx < PW; gx += 22) s += '<line x1="' + gx + '" y1="0" x2="' + gx + '" y2="' + PH + '" stroke="#7fe3d4" stroke-opacity="0.06" stroke-width="0.6"/>'; for (var gy = 0; gy < PH; gy += 22) s += '<line x1="0" y1="' + gy + '" x2="' + PW + '" y2="' + gy + '" stroke="#7fe3d4" stroke-opacity="0.06" stroke-width="0.6"/>'; }
+    return s + '</svg>';
+  }
+  function pDoc(key, content, th, solo) {
+    var bg = pBgSvg(th), title = 'Карта по дате рождения — ' + PDFTITLE[key];
+    return {
+      pageSize: 'A4', pageMargins: [PMX, PMT, PMX, PMB], content: content,
+      info: { title: title, author: 'Калачев М.В.', creator: 'Карта по дате рождения' },
+      defaultStyle: { font: 'DejaVu', fontSize: 11, color: '#ececf2' },
+      background: function () { return { svg: bg, width: PW, height: PH }; },
+      header: function () { return { text: title, fontSize: 6.5, color: th.acc, opacity: 0.7, margin: [PMX, 18, PMX, 0] }; },
+      footer: function (cp, pc) {
+        return { columns: [{ text: solo ? cp + ' / ' + pc : '', fontSize: 6.5, color: th.acc, opacity: 0.6 }, { text: 'Разработано: Калачев М.В.', alignment: 'right', fontSize: 6.5, color: th.acc, opacity: 0.85 }], margin: [PMX, 16, PMX - 12, 0] };
+      },
+      pageBreakBefore: function (cur, nextOnPage) { return !!cur.headlineLevel && nextOnPage.length === 0; }
+    };
+  }
+
+  // ---------- окно: «Готовлю PDF…» и «PDF готов» ----------
+  function pOverlay() {
+    var o = document.getElementById('pdfov'); if (o) o.remove();
+    o = document.createElement('div'); o.id = 'pdfov'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-live', 'polite');
+    o.innerHTML = '<div class="box"><div class="sp"></div><div class="t">Готовлю PDF…</div><div class="pr">Загружаю модули</div></div>';
+    document.body.appendChild(o); return o;
+  }
+  function pStatus(o, t) { var p = o && o.querySelector('.pr'); if (p) p.textContent = t; }
+  function pSave(url, name) { var a = document.createElement('a'); a.href = url; a.download = name; a.rel = 'noopener'; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 100); }
+  function pReady(o, blob, name) {
+    var file = null; try { file = new File([blob], name, { type: 'application/pdf' }); } catch (e) { }
+    var share = false; try { share = !!(file && navigator.canShare && navigator.share && navigator.canShare({ files: [file] })); } catch (e) { }
+    var url = URL.createObjectURL(blob), kb = blob.size / 1024, size = kb > 1024 ? (kb / 1024).toFixed(1).replace('.', ',') + ' МБ' : Math.round(kb) + ' КБ';
+    var box = o.querySelector('.box'); box.innerHTML = '';
+    function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; box.appendChild(e); return e; }
+    el('div', 't', 'PDF готов'); el('div', 'pr', name + ' · ' + size);
+    function close() { o.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 60000); }
+    if (share) {
+      el('button', 'bt pri', 'Поделиться / Сохранить в Файлы').addEventListener('click', function () {
+        navigator.share({ files: [file], title: name.replace(/\.pdf$/, '') }).then(close, function (e) { if (!e || e.name !== 'AbortError') toast('Не удалось открыть «Поделиться» — нажмите «Скачать»'); });
+      });
+    }
+    el('button', 'bt' + (share ? '' : ' pri'), share ? 'Скачать' : 'Скачать ещё раз').addEventListener('click', function () { pSave(url, name); });
+    el('button', 'bt', 'Открыть').addEventListener('click', function () { var w = window.open(url, '_blank'); if (!w) location.href = url; });
+    el('button', 'bt ghost', 'Закрыть').addEventListener('click', close);
+    if (!share) { pSave(url, name); toast('PDF сохранён: ' + name); }
+  }
+
+  // ---------- сборка ----------
+  function makePdf(id) {
+    if (pBusy) return; pBusy = true;
+    var keys = id === 'all' ? ['sum', 'num', 'west', 'ved', 'cn', 'hd'] : [id];
+    var name = 'Карта по дате рождения — ' + (PDFNAME[id] || id) + '.pdf', o = pOverlay(), vfs = {};
+    var need = [pScript('pdfmake'), pScript('h2c'), pFont('font'), pFont('fontB')]; if (keys.length > 1) need.push(pScript('pdflib'));
+    pTimeout(Promise.all(need), 45000).then(function (r) {
+      vfs['DejaVuSans.ttf'] = r[2]; vfs['DejaVuSans-Bold.ttf'] = r[3];
+      return pBuild(keys, o);
+    }).then(function (parts) {
+      pStatus(o, 'Собираю страницы…');
+      var fonts = { DejaVu: { normal: 'DejaVuSans.ttf', bold: 'DejaVuSans-Bold.ttf', italics: 'DejaVuSans.ttf', bolditalics: 'DejaVuSans-Bold.ttf' } };
+      var seq = Promise.resolve(), bufs = [];
+      parts.forEach(function (p, i) {
+        seq = seq.then(function () { pStatus(o, 'Собираю страницы: ' + PDFTITLE[p.key] + (parts.length > 1 ? ' (' + (i + 1) + ' из ' + parts.length + ')' : '')); return pWait(30); })
+          .then(function () { return new Promise(function (res, rej) { try { window.pdfMake.createPdf(p.doc, null, fonts, vfs).getBuffer(function (b) { bufs.push(b); res(); }); } catch (e) { rej(e); } }); });
+      });
+      return seq.then(function () {
+        if (bufs.length === 1) return new Blob([bufs[0]], { type: 'application/pdf' });
+        pStatus(o, 'Объединяю разделы…');
+        var L = window.PDFLib;
+        return L.PDFDocument.create().then(function (out) {
+          var s2 = Promise.resolve();
+          bufs.forEach(function (b) { s2 = s2.then(function () { return L.PDFDocument.load(b); }).then(function (d) { return out.copyPages(d, d.getPageIndices()); }).then(function (pg) { pg.forEach(function (x) { out.addPage(x); }); }); });
+          return s2.then(function () { out.setTitle('Карта по дате рождения — полный отчёт'); out.setAuthor('Калачев М.В.'); out.setCreator('Карта по дате рождения'); return out.save(); });
+        }).then(function (u8) { return new Blob([u8], { type: 'application/pdf' }); });
+      });
+    }).then(function (blob) {
+      pReady(o, blob, name);
+    }).catch(function (e) {
+      try { console.warn('PDF:', e); } catch (er) { }
+      o.remove(); toast('PDF-файл не собрался — открываю печать'); setTimeout(function () { printPanel(id); }, 600);
+    }).then(function () { pBusy = false; });
+  }
+  function pBuild(keys, o) {
+    var root = document.documentElement, oldTheme = root.getAttribute('data-theme'), y = window.scrollY, saved = [], opened = [], parts = [], jobs = [];
+    var panels = keys.map(function (k) { return document.getElementById('p-' + k); });
+    function enter() {
+      root.setAttribute('data-theme', 'dark'); // общие блоки — в тёмной палитре, как фон страниц
+      root.setAttribute('data-pdfgen', '1');
+      panels.forEach(function (p) { p.classList.add('pdf-on'); });
+      Array.prototype.forEach.call(document.querySelectorAll('#out details:not([open])'), function (d) { d.open = true; opened.push(d); });
+      Array.prototype.forEach.call(document.querySelectorAll('.glow-num'), function (n) { n.textContent = n.getAttribute('data-count'); });
+      pInlineSvg($('out'), saved);
+    }
+    function leave() {
+      saved.forEach(function (s) { if (s[1] == null) s[0].removeAttribute('style'); else s[0].setAttribute('style', s[1]); });
+      opened.forEach(function (d) { d.open = false; });
+      panels.forEach(function (p) { p.classList.remove('pdf-on'); });
+      root.removeAttribute('data-pdfgen');
+      if (oldTheme) root.setAttribute('data-theme', oldTheme); else root.removeAttribute('data-theme');
+      window.scrollTo(0, y);
+    }
+    enter();
+    return pWait(60).then(function () {
+      var disc = document.getElementById('sec-disc'), discOn = disc && getComputedStyle(disc).display !== 'none';
+      keys.forEach(function (k, i) {
+        var th = PTHEME[k], ctx = { bg: th.bg, w: PW - 2 * PMX, acc: th.acc };
+        var content = pWalk(panels[i], ctx, jobs, []);
+        if (discOn && i === keys.length - 1 && keys.length === 1) { content.push({ text: '', pageBreak: 'before' }); pWalk(disc, ctx, jobs, content); }
+        parts.push({ key: k, doc: pDoc(k, content, th, keys.length === 1) });
+      });
+      if (discOn && keys.length > 1) { var dth = PTHEME.disc; parts.push({ key: 'disc', doc: pDoc('disc', pWalk(disc, { bg: dth.bg, w: PW - 2 * PMX, acc: dth.acc }, jobs, []), dth) }); }
+      var seq = Promise.resolve();
+      jobs.forEach(function (j, i) {
+        seq = seq.then(function () { pStatus(o, 'Рисую схемы: ' + (i + 1) + ' из ' + jobs.length); return pWait(0); })
+          .then(function () { return pRaster(j); })
+          .then(function (u) { j.node.image = u; }, function () { delete j.node.image; delete j.node.width; j.node.text = ''; });
+      });
+      return seq;
+    }).then(function () { leave(); return parts; }, function (e) { leave(); throw e; });
+  }
+  window.PsyUI = { makePdf: makePdf, preparePrint: preparePrint, endPrint: endPrint, compute: compute, localToUTC: localToUTC };
 })();
 
 </script>
