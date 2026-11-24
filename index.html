@@ -191,8 +191,7 @@ svg text{font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2","No
 #splash .sp-ring{transform-origin:100px 100px;transform-box:view-box}
 #splash .sp-geo{fill:none;stroke:#e6c06a;stroke-width:.8;opacity:.7}
 #splash .t1{font-size:22px;font-weight:600;margin-top:18px;letter-spacing:.4px}
-#splash .t2{margin-top:22px;font-size:16px;font-weight:600;letter-spacing:1.2px;color:#f1d27f;text-shadow:0 0 12px rgba(241,210,127,.45)}
-#splash .t2:before{content:"";display:block;width:140px;height:1px;margin:0 auto 10px;background:linear-gradient(90deg,transparent,#e6c06a,transparent)}
+#splash .t2{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));margin:0;text-align:center;font-size:8px;font-weight:600;letter-spacing:.8px;color:#f1d27f;opacity:.8}
 @media (max-width:380px){.row3{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}}
 @page{size:A4;margin:0}
 @media print{
